@@ -116,6 +116,39 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
+// Hook para usar toast en cualquier componente
+const useToast = () => {
+  const [toasts, setToasts] = React.useState<ToastProps[]>([])
+
+  const toast = (props: Omit<ToastProps, 'open'>) => {
+    const id = Math.random().toString(36).substring(2, 9)
+    const newToast = { ...props, open: true, id }
+    setToasts(prev => [...prev, newToast])
+
+    // Auto-remove toast after 5 seconds
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, 5000)
+
+    return id
+  }
+
+  const ToastComponents = toasts.map((toast) => (
+    <Toast key={toast.id} {...toast}>
+      <div className="grid gap-1">
+        {toast.title && <ToastTitle>{toast.title}</ToastTitle>}
+        {toast.children && <ToastDescription>{toast.children}</ToastDescription>}
+      </div>
+      <ToastClose />
+    </Toast>
+  ))
+
+  return {
+    toast,
+    toasts: ToastComponents
+  }
+}
+
 export {
   type ToastProps,
   type ToastActionElement,
@@ -126,4 +159,5 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
+  useToast,
 }

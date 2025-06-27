@@ -7,51 +7,48 @@ import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-lg shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Plantillas Totales</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">42</div>
-            <p className="text-xs text-muted-foreground">+5 desde el mes pasado</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Certificados Emitidos</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12,345</div>
-            <p className="text-xs text-muted-foreground">+1,200 este mes</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Uso de API</CardTitle>
-            <Download className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">78%</div>
-            <p className="text-xs text-muted-foreground">La cuota se reinicia en 12 días</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg shadow-sm bg-primary/5 border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-lg font-headline">Crear Nuevo Certificado</CardTitle>
-            <CardDescription>Empieza desde una plantilla o créala desde cero.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+    <div className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-3xl text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-6">
+          <FileText className="h-8 w-8 text-primary" />
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
+          Bienvenido a Certify
+        </h1>
+        <p className="text-lg text-muted-foreground mb-8">
+          Tu plataforma para crear y gestionar certificados digitales de manera sencilla y profesional.
+        </p>
+        
+        <div className="mt-10">
+          <h2 className="text-lg font-medium text-foreground mb-4">¿Listo para comenzar?</h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
               <Link href="/templates/new">
-                <PlusCircle className="mr-2 h-4 w-4" /> Nueva Plantilla
+                <PlusCircle className="mr-2 h-5 w-5" /> Crear tu primera plantilla
               </Link>
             </Button>
-          </CardContent>
-        </Card>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/templates">
+                <FileText className="mr-2 h-5 w-5" /> Ver documentación
+              </Link>
+            </Button>
+          </div>
+        </div>
+        
+        <div className="mt-16 pt-8 border-t border-border">
+          <h3 className="text-sm font-medium text-muted-foreground mb-4">¿Neitas ayuda para comenzar?</h3>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="#">Documentación</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="#">Soporte</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="#">Ejemplos</Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Card className="rounded-lg shadow-sm">
@@ -60,36 +57,17 @@ export default function DashboardPage() {
           <CardDescription>Un resumen de los últimos certificados generados.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Destinatario</TableHead>
-                <TableHead>Plantilla</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>John Doe</TableCell>
-                <TableCell>Certificado de Finalización</TableCell>
-                <TableCell><Badge variant="outline" className="text-green-600 border-green-600">Emitido</Badge></TableCell>
-                <TableCell>2024-07-20</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Jane Smith</TableCell>
-                <TableCell>Bootcamp de Desarrollo Web</TableCell>
-                <TableCell><Badge variant="outline" className="text-green-600 border-green-600">Emitido</Badge></TableCell>
-                <TableCell>2024-07-19</TableCell>
-              </TableRow>
-               <TableRow>
-                <TableCell>Sam Wilson</TableCell>
-                <TableCell>Fundamentos de Ciencia de Datos</TableCell>
-                <TableCell><Badge variant="outline" className="text-yellow-600 border-yellow-600">Pendiente</Badge></TableCell>
-                <TableCell>2024-07-21</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <div className="flex flex-col items-center justify-center p-12">
+            <h2 className="text-lg font-medium text-foreground mb-4">No hay actividad reciente</h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Comienza a crear y gestionar certificados digitales para ver tu actividad reciente aquí.
+            </p>
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+              <Link href="/templates/new">
+                <PlusCircle className="mr-2 h-5 w-5" /> Crear tu primera plantilla
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

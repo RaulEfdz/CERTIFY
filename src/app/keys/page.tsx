@@ -1,70 +1,53 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { PlusCircle, MoreVertical, Copy, RotateCw, Trash2 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-
-const apiKeys = [
-    { id: 'prod_sk_...', name: 'Clave de Producción', created: 'hace 2 meses', lastUsed: 'hace 3 horas', status: 'Activa' },
-    { id: 'staging_sk_...', name: 'Clave de Staging', created: 'hace 2 meses', lastUsed: 'hace 1 día', status: 'Activa' },
-    { id: 'dev_sk_...', name: 'Clave de Desarrollo', created: 'hace 1 semana', lastUsed: 'hace 5 días', status: 'Revocada' },
-];
+import { PlusCircle, Key, FileText, Code } from "lucide-react";
+import Link from "next/link";
 
 export default function ApiKeysPage() {
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    {/* El título y la descripción estarán en el componente Header */}
+        <div className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div className="w-full max-w-3xl text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-6">
+                    <Key className="h-8 w-8 text-primary" />
                 </div>
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90"><PlusCircle className="mr-2 h-4 w-4" /> Crear Clave</Button>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
+                    No hay claves de API
+                </h1>
+                <p className="text-lg text-muted-foreground mb-8">
+                    Las claves de API te permiten autenticarte con nuestra API y acceder a tus certificados y plantillas de forma programática.
+                </p>
+                
+                <div className="mt-10">
+                    <h2 className="text-lg font-medium text-foreground mb-4">¿Listo para crear tu primera clave de API?</h2>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+                            <div>
+                                <PlusCircle className="mr-2 h-5 w-5" /> Crear clave de API
+                            </div>
+                        </Button>
+                        <Button asChild size="lg" variant="outline">
+                            <Link href="#">
+                                <Code className="mr-2 h-5 w-5" /> Ver documentación
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+                
+                <div className="mt-16 pt-8 border-t border-border">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4">¿Neitas ayuda para comenzar?</h3>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href="#">Guía de la API</Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href="#">Soporte técnico</Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href="#">Ver ejemplos de código</Link>
+                        </Button>
+                    </div>
+                </div>
             </div>
-            <Card className="rounded-lg shadow-sm">
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nombre</TableHead>
-                                <TableHead>Clave (prefijo)</TableHead>
-                                <TableHead>Creado</TableHead>
-                                <TableHead>Último Uso</TableHead>
-                                <TableHead>Estado</TableHead>
-                                <TableHead><span className="sr-only">Acciones</span></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {apiKeys.map(key => (
-                                <TableRow key={key.id}>
-                                    <TableCell className="font-medium">{key.name}</TableCell>
-                                    <TableCell className="font-code">{key.id}</TableCell>
-                                    <TableCell>{key.created}</TableCell>
-                                    <TableCell>{key.lastUsed}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={key.status === 'Activa' ? 'default' : 'destructive'}>
-                                            {key.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem><Copy className="mr-2 h-4 w-4" /> Copiar Clave</DropdownMenuItem>
-                                                <DropdownMenuItem><RotateCw className="mr-2 h-4 w-4" /> Rotar Clave</DropdownMenuItem>
-                                                <DropdownMenuItem className="text-destructive focus:text-destructive-foreground"><Trash2 className="mr-2 h-4 w-4" /> Revocar Clave</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
         </div>
     );
 }
