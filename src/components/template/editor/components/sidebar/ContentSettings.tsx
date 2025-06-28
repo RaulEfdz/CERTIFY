@@ -1,0 +1,58 @@
+
+import { Card, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui";
+import { TypeIcon } from "lucide-react";
+import { FormField } from "../FormField";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+export const ContentSettings = ({ state, setters }) => (
+    <Card>
+        <Accordion type="single" collapsible defaultValue="content">
+            <AccordionItem value="content" className="border-b-0">
+                <AccordionTrigger className="p-4 hover:no-underline">
+                    <div className="flex items-center">
+                        <TypeIcon className="h-4 w-4 mr-2" />
+                        <span>Contenido</span>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="p-4 pt-0">
+                    <div className="space-y-4">
+                        <FormField label="Título">
+                            <Input 
+                                value={state.title} 
+                                onChange={(e) => setters.setTitle(e.target.value)}
+                                placeholder="Ej: Certificado de Participación"
+                            />
+                        </FormField>
+                        
+                        <FormField label="Texto Principal">
+                            <Textarea 
+                                value={state.body1} 
+                                onChange={(e) => setters.setBody1(e.target.value)}
+                                placeholder="Ej: Se otorga el presente certificado a:"
+                                rows={2}
+                            />
+                        </FormField>
+                        
+                        <FormField label="Texto Secundario">
+                            <Textarea 
+                                value={state.body2} 
+                                onChange={(e) => setters.setBody2(e.target.value)}
+                                placeholder="Ej: Por haber completado exitosamente el curso de..."
+                                rows={3}
+                            />
+                        </FormField>
+                        
+                        <FormField label="Nombre del Curso">
+                            <Input 
+                                value={state.courseName} 
+                                onChange={(e) => setters.setCourseName(e.target.value)}
+                                placeholder="Ej: Introducción a la Programación"
+                            />
+                        </FormField>
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    </Card>
+);

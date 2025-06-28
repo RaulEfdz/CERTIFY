@@ -47,9 +47,9 @@ export function MainNav() {
       icon: <Icons.bookOpen className="h-5 w-5" />,
     },
     {
-      href: "/dashboard/certificates",
+      href: "/dashboard/certificates/editor",
       label: "Certificados",
-      icon: <Icons.home className="h-5 w-5" />, // Using home as fallback
+      icon: <Icons.award className="h-5 w-5" />,
     },
     {
       href: "/dashboard/analytics",

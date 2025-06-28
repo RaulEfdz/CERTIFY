@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
@@ -19,9 +20,10 @@ import {
 interface ImageUploadProps {
   onUpload: (dataUrl: string) => void;
   label: string;
+  className?: string;
 }
 
-export default function ImageUpload({ onUpload, label }: ImageUploadProps) {
+export default function ImageUpload({ onUpload, label, className = '' }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [showResizeModal, setShowResizeModal] = useState(false);
@@ -115,7 +117,7 @@ export default function ImageUpload({ onUpload, label }: ImageUploadProps) {
 
   return (
     <>
-      <div>
+      <div className={cn("space-y-2", className)}>
         <Input
           type="file"
           ref={inputRef}
