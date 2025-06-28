@@ -139,16 +139,17 @@ export function CreateOrganizationForm({
         type: 'manual',
         message: 'Error al procesar la imagen',
       });
-      toast.error('Error al procesar la imagen');
     }
   }, [form]);
 
   // Función para remover imagen
   const removeImage = useCallback(() => {
-    setPreviewUrl(null);
-    form.setValue('logoFile', null, { shouldValidate: true });
-    form.clearErrors('logoFile');
-  }, [form]);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    form.setValue('logoFile', null);
+  }, [previewUrl, form]);
 
   // Función para subir imagen a Cloudinary
   const uploadImageToCloudinary = async (file: File): Promise<CloudinaryResponse> => {
@@ -267,99 +268,113 @@ export function CreateOrganizationForm({
 
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle>Crear nueva organización</CardTitle>
-        <CardDescription>
-          Complete la información para crear una nueva organización en el sistema.
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl text-gray-900">Crear organización</CardTitle>
+        <CardDescription className="text-gray-600">
+          Complete la información de su organización para comenzar a emitir certificados.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
-              {/* Campo para subir logo */}
-              <FormField
-                control={form.control}
-                name="logoFile"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Logo de la organización</FormLabel>
-                    <FormDescription>
-                      Suba una imagen para el logo (opcional). Máximo 5MB. Formatos: JPG, PNG, GIF.
-                    </FormDescription>
-                    <FormControl>
-                      <ImageUpload
-                        value={previewUrl}
-                        onChange={handleImageUpload}
-                        onRemove={removeImage}
-                        disabled={isLoading}
-                        accept="image/*"
-                        maxSize={5 * 1024 * 1024}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Columna izquierda - Logo */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <FormField
+                    control={form.control}
+                    name="logoFile"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-900 text-base">Logo de la organización</FormLabel>
+                        <FormDescription className="text-gray-600 text-sm">
+                          Suba una imagen cuadrada (máx. 5MB). Formato recomendado: 512x512px.
+                        </FormDescription>
+                        <FormControl>
+                          <div className="mt-2">
+                            <ImageUpload
+                              value={previewUrl}
+                              onChange={handleImageUpload}
+                              onRemove={removeImage}
+                              disabled={isLoading}
+                              maxSize={5 * 1024 * 1024} // 5MB
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               
-              {/* Campo para el nombre */}
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre de la organización *</FormLabel>
-                    <FormDescription>
-                      Ingrese el nombre completo de su organización (3-100 caracteres).
-                    </FormDescription>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled={isLoading}
-                        placeholder="Ej: Mi Empresa S.A."
-                        maxLength={100}
-                        autoComplete="organization"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              {/* Campo para el sitio web */}
-              <FormField
-                control={form.control}
-                name="website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sitio web</FormLabel>
-                    <FormDescription>
-                      URL del sitio web de la organización (opcional).
-                    </FormDescription>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="url"
-                        disabled={isLoading}
-                        placeholder="https://ejemplo.com"
-                        value={field.value || ''}
-                        autoComplete="url"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Columna derecha - Campos del formulario */}
+              <div className="space-y-6">
+                {/* Campo para el nombre */}
+                <div className="space-y-2">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-900 text-base">Nombre de la organización *</FormLabel>
+                        <FormDescription className="text-gray-600 text-sm">
+                          Ingrese el nombre completo de su organización (3-100 caracteres).
+                        </FormDescription>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            disabled={isLoading}
+                            placeholder="Ej: Mi Empresa S.A."
+                            maxLength={100}
+                            autoComplete="organization"
+                            className="mt-1"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                {/* Campo para el sitio web */}
+                <div className="space-y-2">
+                  <FormField
+                    control={form.control}
+                    name="website"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-900 text-base">Sitio web</FormLabel>
+                        <FormDescription className="text-gray-600 text-sm">
+                          URL del sitio web de la organización (opcional).
+                        </FormDescription>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="url"
+                            disabled={isLoading}
+                            placeholder="https://ejemplo.com"
+                            value={field.value || ''}
+                            autoComplete="url"
+                            className="mt-1"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
-            
+
             {/* Barra de progreso durante la carga */}
             {isLoading && uploadProgress > 0 && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-muted-foreground">
+              <div className="col-span-full space-y-2">
+                <div className="flex justify-between text-sm text-gray-600">
                   <span>Creando organización...</span>
                   <span>{uploadProgress}%</span>
                 </div>
-                <div className="w-full bg-secondary rounded-full h-2">
+                <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
                     style={{ width: `${uploadProgress}%` }}
@@ -369,14 +384,14 @@ export function CreateOrganizationForm({
             )}
             
             {/* Botones de acción */}
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t">
+            <div className="col-span-full flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t">
               {onCancel && (
                 <Button 
-                  type="button" 
-                  variant="outline" 
+                  type="button"
+                  variant="outline"
                   onClick={onCancel}
                   disabled={isLoading}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300 hover:border-gray-400"
                 >
                   Cancelar
                 </Button>
@@ -399,7 +414,7 @@ export function CreateOrganizationForm({
             
             {/* Mensaje de ayuda si hay errores */}
             {hasErrors && !isLoading && (
-              <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100">
                 Por favor, corrija los errores antes de continuar.
               </div>
             )}

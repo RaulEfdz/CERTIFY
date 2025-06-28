@@ -20,7 +20,7 @@ export function ImageUpload({
   onChange,
   onRemove,
   disabled = false,
-  maxSize = 2 * 1024 * 1024, // 2MB por defecto
+  maxSize = 5 * 1024 * 1024, // 5MB por defecto
   accept = {
     'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp'],
   },
@@ -56,11 +56,11 @@ export function ImageUpload({
   if (value) {
     return (
       <div className="relative group">
-        <div className="relative aspect-square w-full h-64 rounded-md overflow-hidden">
+        <div className="relative w-[500px] h-[500px] rounded-md overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-50">
           <img
             src={value}
-            alt="Preview"
-            className="object-cover w-full h-full"
+            alt="Vista previa del logo"
+            className="object-contain max-w-[90%] max-h-[90%]"
           />
         </div>
         <Button
@@ -81,30 +81,31 @@ export function ImageUpload({
     <div
       {...getRootProps()}
       className={cn(
-        'border-2 border-dashed rounded-md p-8 text-center transition-colors',
+        'border-2 border-dashed rounded-md p-8 text-center transition-colors w-[500px] h-[500px] flex items-center justify-center',
         isDragging
           ? 'border-primary bg-primary/10'
-          : 'border-muted-foreground/25 hover:border-primary/50',
+          : 'border-gray-300 hover:border-primary/50',
         disabled && 'opacity-50 cursor-not-allowed',
         'cursor-pointer'
       )}
     >
       <input {...getInputProps()} />
-      <div className="flex flex-col items-center justify-center space-y-2">
-        <Icons.upload className="h-10 w-10 text-muted-foreground" />
-        <div className="text-sm text-muted-foreground">
-          {isDragActive ? (
-            <p>Suelta la imagen aquí...</p>
-          ) : (
-            <div className="text-center">
-              <p className="font-medium">
+      <div className="flex flex-col items-center justify-center space-y-4 p-4">
+        <Icons.upload className="h-16 w-16 text-gray-400" />
+        <div className="space-y-2">
+          <p className="font-medium text-gray-900">Sin archivo seleccionado</p>
+          <p className="text-sm text-gray-600">
+            {isDragActive ? (
+              'Suelta el logo aquí...'
+            ) : (
+              <>
                 Arrastra una imagen o haz clic para seleccionar
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                PNG, JPG, GIF hasta {maxSize / (1024 * 1024)}MB
-              </p>
-            </div>
-          )}
+              </>
+            )}
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            PNG, JPG, GIF hasta 5MB
+          </p>
         </div>
       </div>
     </div>

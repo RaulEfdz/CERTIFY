@@ -162,14 +162,31 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      router.push('/login')
-      router.refresh()
-      return { error: null }
+      // Clear the session on the server side
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Error al cerrar sesión');
+      }
+      
+      // Clear local session state
+      await supabase.auth.signOut();
+      
+      // Force a full page reload to ensure all state is cleared
+      window.location.href = '/login';
+      
+      // Small delay to ensure the redirect happens
+      await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error) {
-      console.error('Error al cerrar sesión:', error)
-      return { error }
+      console.error('Error al cerrar sesión:', error);
+      // Still redirect to login even if there was an error
+      window.location.href = '/login';
     }
   }
 
