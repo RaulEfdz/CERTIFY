@@ -20,15 +20,21 @@ export function ImprovedTemplateEditor() {
                     <TemplateSidebar state={state} setters={state} />
                 </aside>
                 {/* Panel central de configuración y vista previa */}
-                <main className="flex flex-1 overflow-hidden">
-                    {/* Panel de configuración central, scrollable */}
-                    <section className="flex-1 p-0 md:p-6 overflow-y-auto flex flex-col">
+                <main className="flex flex-1 flex-col overflow-hidden">
+                    {/* Header siempre arriba, ocupa todo el ancho */}
+                    <div className="p-0 md:p-6 pb-0">
                         <TemplateHeader />
-                        {/* Aquí puedes poner más contenido de configuración central si lo necesitas */}
-                    </section>
-                    {/* Panel de vista previa a la derecha, siempre visible */}
-                    <div className="flex-1 p-0 md:p-6 flex items-center justify-center bg-muted/40 min-w-0 max-w-4xl">
-                        <TemplatePreview templateHtml={templateHtml} certificateSize={state.certificateSize} />
+                    </div>
+                    {/* Paneles: configuración y preview */}
+                    <div className="flex flex-1 overflow-hidden">
+                        {/* Panel de configuración central, scrollable */}
+                        <section className="flex-1 p-0 md:p-6 overflow-y-auto flex flex-col">
+                            {/* Aquí puedes poner más contenido de configuración central si lo necesitas */}
+                        </section>
+                        {/* Panel de vista previa a la derecha, siempre visible */}
+                        <div className="flex-1 p-0 md:p-6 flex items-center justify-center bg-muted/40 min-w-0 max-w-4xl">
+                            <TemplatePreview templateHtml={templateHtml} certificateSize={state.certificateSize} />
+                        </div>
                     </div>
                 </main>
             </div>
