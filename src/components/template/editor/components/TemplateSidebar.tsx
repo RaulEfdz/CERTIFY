@@ -48,7 +48,7 @@ interface TemplateSidebarProps {
 
 
 export const TemplateSidebar = ({ state, setters }: TemplateSidebarProps) => (
-    <div className="w-96 border-r overflow-y-auto bg-card">
+    <div className="w-full md:w-96 border-r overflow-y-auto bg-card max-h-[60vh] md:max-h-none">
         <div className="p-4 space-y-6">
             <h2 className="text-lg font-semibold">Configuración</h2>
             <Accordion type="multiple" defaultValue={['size', 'logo', 'content', 'background']}>

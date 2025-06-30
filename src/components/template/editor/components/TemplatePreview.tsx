@@ -114,7 +114,7 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
     };
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-muted/50">
+        <div className="flex-1 flex flex-col overflow-hidden bg-muted/50 min-w-0">
             <div className="border-b bg-card p-2 flex justify-between items-center">
                 <Tabs defaultValue="preview" className="w-full">
                     <div className="flex justify-between items-center w-full">
@@ -212,16 +212,17 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
                     </div>
                     
                     <TabsContent value="preview" className="m-0 h-[calc(100vh-120px)]">
-                        <div 
+                        <div
                             ref={previewContainerRef}
                             className={cn(
-                                'h-full overflow-auto bg-gradient-to-br from-muted/20 to-muted/30 p-4',
+                                'h-full overflow-auto bg-gradient-to-br from-muted/20 to-muted/30 p-2',
                                 isPreviewFullscreen ? 'fixed inset-0 z-50 bg-background' : '',
-                                'flex items-center justify-center'
+                                'flex items-center justify-center',
+                                'min-w-0'
                             )}
                         >
-                            <div className="relative w-full h-full flex items-center justify-center">
-                                <div 
+                            <div className="relative w-full h-full flex items-center justify-center min-w-0">
+                                <div
                                     className={cn(
                                         'bg-white shadow-xl rounded-lg overflow-hidden border border-border/50',
                                         'transition-transform duration-200',
@@ -231,27 +232,39 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
                                             'w-full h-full': fitTo === 'page',
                                             'w-full max-w-5xl': fitTo !== 'page',
                                             'aspect-[4/3]': certificateSize === 'landscape',
-                                            'aspect-square': certificateSize === 'square'
+                                            'aspect-square': certificateSize === 'square',
+                                            'max-w-full': true,
+                                            'max-h-[80vh]': true
                                         }
                                     )}
                                     style={{
                                         width: certificateSize === 'landscape' ? '1200px' : '900px',
                                         height: '900px',
+                                        maxWidth: '100%',
+                                        maxHeight: '80vh',
                                         transform: 'none',
-                                        transformOrigin: 'center center'
+                                        transformOrigin: 'center center',
+                                        overflow: 'auto'
                                     }}
                                 >
-                                    <iframe 
+                                    <iframe
                                         ref={iframeRef}
                                         srcDoc={templateHtml}
                                         className={cn(
                                             'border-0',
                                             'bg-white',
                                             'w-full h-full',
-                                            'overflow-auto'
+                                            'overflow-auto',
+                                            'rounded-lg'
                                         )}
                                         title="Vista Previa del Certificado"
                                         sandbox="allow-same-origin allow-scripts"
+                                        style={{
+                                            maxWidth: '100%',
+                                            maxHeight: '80vh',
+                                            minWidth: 0,
+                                            minHeight: 0
+                                        }}
                                     />
                                 </div>
                             </div>
