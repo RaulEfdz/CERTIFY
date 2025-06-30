@@ -1,4 +1,4 @@
-{
+a{
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack -p 9003",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
