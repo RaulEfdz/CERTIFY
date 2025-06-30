@@ -31,6 +31,19 @@ export function MainNav() {
     }
   }, [isCollapsed, isMounted]);
 
+  // Listen for toggle events from header
+  useEffect(() => {
+    const handleToggle = (event: CustomEvent) => {
+      setIsCollapsed(event.detail.collapsed);
+    };
+
+    window.addEventListener('dashboardSidebarToggle', handleToggle as EventListener);
+    
+    return () => {
+      window.removeEventListener('dashboardSidebarToggle', handleToggle as EventListener);
+    };
+  }, []);
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };

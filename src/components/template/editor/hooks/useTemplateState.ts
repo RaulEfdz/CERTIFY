@@ -4,7 +4,7 @@ import { CertificateSize, SignatureData, INITIAL_CONFIG, TemplateConfig } from '
 
 export const useTemplateState = (initialState = INITIAL_CONFIG) => {
     const [certificateSize, setCertificateSize] = useState<CertificateSize>(initialState.certificateSize);
-    const [logoUrl, setLogoUrl] = useState<string | null>(initialState.logoUrl);
+    const [logoUrl, setLogoUrl] = useState<string>(initialState.logoUrl);
     const [logoWidth, setLogoWidth] = useState<number>(initialState.logoWidth);
     const [logoHeight, setLogoHeight] = useState<number>(initialState.logoHeight);
     const [backgroundUrl, setBackgroundUrl] = useState<string | null>(initialState.backgroundUrl);
@@ -14,12 +14,15 @@ export const useTemplateState = (initialState = INITIAL_CONFIG) => {
     const [body2, setBody2] = useState<string>(initialState.body2);
     const [courseName, setCourseName] = useState<string>(initialState.courseName);
     const [studentName, setStudentName] = useState<string>(initialState.studentName);
+    const [directorName, setDirectorName] = useState<string>(initialState.directorName || '');
     const [signatures, setSignatures] = useState<SignatureData[]>(initialState.signatures);
     const [customCss, setCustomCss] = useState<string>(initialState.customCss);
     const [customJs, setCustomJs] = useState<string>(initialState.customJs);
     const [titleColor, setTitleColor] = useState<string>(initialState.titleColor);
     const [bodyColor, setBodyColor] = useState<string>(initialState.bodyColor);
     const [orientation, setOrientation] = useState<string>(initialState.orientation || "landscape");
+    const [date, setDate] = useState<string>(initialState.date || '');
+    const [dateLocale, setDateLocale] = useState<string>(initialState.dateLocale || '');
 
     return {
         certificateSize, setCertificateSize,
@@ -33,11 +36,14 @@ export const useTemplateState = (initialState = INITIAL_CONFIG) => {
         body2, setBody2,
         courseName, setCourseName,
         studentName, setStudentName,
+        directorName, setDirectorName,
         signatures, setSignatures,
         customCss, setCustomCss,
         customJs, setCustomJs,
         titleColor, setTitleColor,
         bodyColor, setBodyColor,
         orientation, setOrientation,
+        date, setDate,
+        dateLocale, setDateLocale,
     };
 };

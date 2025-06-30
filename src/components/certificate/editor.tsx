@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Slider } from '../ui/slider';
 import { ColorPicker } from '@/components/ui/color-picker';
+import { ChevronDown, ChevronUp, Eye, EyeOff, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 
 type FontFamily = 'Arial' | 'Times New Roman' | 'Courier New' | 'Georgia' | 'Verdana';
 
@@ -46,6 +47,19 @@ export function CertificateEditor() {
     },
   });
 
+  // UI state for collapsible sections
+  const [expandedSections, setExpandedSections] = useState({
+    typography: true,
+    colors: true,
+    border: true,
+  });
+
+  // State for hiding/showing slider controls
+  const [showSliderControls, setShowSliderControls] = useState(true);
+  
+  // State for hiding/showing entire sidebar
+  const [showSidebar, setShowSidebar] = useState(true);
+
   const handleChange = <K extends keyof Omit<Template, 'styles'>>(
     field: K,
     value: Template[K]
@@ -83,10 +97,107 @@ export function CertificateEditor() {
     return typeof value === 'string' && /^#([0-9A-F]{3}){1,2}$/i.test(value);
   };
 
+  // Toggle section expansion
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  // Enhanced slider component with better UX
+  const EnhancedSlider = ({ 
+    label, 
+    value, 
+    min, 
+    max, 
+    step = 1, 
+    unit = '', 
+    onChange,
+    showValue = true 
+  }: {
+    label: string;
+    value: number;
+    min: number;
+    max: number;
+    step?: number;
+    unit?: string;
+    onChange: (value: number) => void;
+    showValue?: boolean;
+  }) => (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">{label}</Label>
+        {showValue && (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-muted-foreground">
+              {value}{unit}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={() => onChange(min + (max - min) / 2)}
+              title="Restablecer a valor medio"
+            >
+              ↺
+            </Button>
+          </div>
+        )}
+      </div>
+      <div className="relative">
+        <Slider
+          min={min}
+          max={max}
+          step={step}
+          value={[value]}
+          onValueChange={([newValue]) => onChange(newValue)}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+          <span>{min}{unit}</span>
+          <span>{max}{unit}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Collapsible section component
+  const CollapsibleSection = ({ 
+    title, 
+    isExpanded, 
+    onToggle, 
+    children 
+  }: {
+    title: string;
+    isExpanded: boolean;
+    onToggle: () => void;
+    children: React.ReactNode;
+  }) => (
+    <div className="border border-border rounded-lg">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
+      >
+        <span className="font-medium text-sm">{title}</span>
+        {isExpanded ? (
+          <ChevronUp className="h-4 w-4" />
+        ) : (
+          <ChevronDown className="h-4 w-4" />
+        )}
+      </button>
+      {isExpanded && (
+        <div className="p-3 pt-0 space-y-4">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <div className="flex h-full">
+    <div className="flex h-full relative">
       {/* Sidebar de propiedades */}
-      <div className="w-80 border-r h-[calc(100vh-4rem)]">
+      <div className={`${showSidebar ? 'w-80' : 'w-0'} border-r h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out overflow-hidden`}>
         <ScrollArea className="h-full p-4">
           <Tabs defaultValue="content" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
@@ -126,73 +237,176 @@ export function CertificateEditor() {
             </TabsContent>
 
             <TabsContent value="design" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label>Fuente</Label>
-                <select
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={template.styles.fontFamily}
-                  onChange={(e) => handleStyleChange('fontFamily', e.target.value as FontFamily)}
+              {/* Toggle button for slider controls */}
+              <div className="flex items-center justify-between mb-4">
+                <Label className="text-sm font-medium">Controles de diseño</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSliderControls(!showSliderControls)}
+                  className="h-8 px-2"
                 >
-                  <option value="Arial">Arial</option>
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Courier New">Courier New</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Verdana">Verdana</option>
-                </select>
+                  {showSliderControls ? (
+                    <>
+                      <EyeOff className="h-4 w-4 mr-1" />
+                      Ocultar
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="h-4 w-4 mr-1" />
+                      Mostrar
+                    </>
+                  )}
+                </Button>
               </div>
 
-              <div className="space-y-2">
-                <Label>Tamaño de fuente: {template.styles.fontSize}px</Label>
-                <Slider
-                  min={12}
-                  max={48}
-                  step={1}
-                  value={[template.styles.fontSize]}
-                  onValueChange={([value]) => handleStyleChange('fontSize', value)}
-                />
-              </div>
+              {showSliderControls && (
+                <div className="space-y-4">
+                  {/* Typography Section */}
+                  <CollapsibleSection
+                    title="Tipografía"
+                    isExpanded={expandedSections.typography}
+                    onToggle={() => toggleSection('typography')}
+                  >
+                    <div className="space-y-2">
+                      <Label>Fuente</Label>
+                      <select
+                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={template.styles.fontFamily}
+                        onChange={(e) => handleStyleChange('fontFamily', e.target.value as FontFamily)}
+                      >
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
+                      </select>
+                    </div>
 
-              <div className="space-y-2">
-                <Label>Color del texto</Label>
-                <ColorPicker
-                  color={template.styles.textColor}
-                  onChange={(color: string) => handleColorChange(color, 'textColor')}
-                />
-              </div>
+                    <EnhancedSlider
+                      label="Tamaño de fuente"
+                      value={template.styles.fontSize}
+                      min={12}
+                      max={48}
+                      step={1}
+                      unit="px"
+                      onChange={(value) => handleStyleChange('fontSize', value)}
+                    />
+                  </CollapsibleSection>
 
-              <div className="space-y-2">
-                <Label>Color de fondo</Label>
-                <ColorPicker
-                  color={template.styles.backgroundColor}
-                  onChange={(color: string) => handleColorChange(color, 'backgroundColor')}
-                />
-              </div>
+                  {/* Colors Section */}
+                  <CollapsibleSection
+                    title="Colores"
+                    isExpanded={expandedSections.colors}
+                    onToggle={() => toggleSection('colors')}
+                  >
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Color del texto</Label>
+                        <ColorPicker
+                          color={template.styles.textColor}
+                          onChange={(color: string) => handleColorChange(color, 'textColor')}
+                        />
+                      </div>
 
-              <div className="space-y-2">
-                <Label>Borde: {template.styles.borderWidth}px</Label>
-                <Slider
-                  min={0}
-                  max={10}
-                  step={1}
-                  value={[template.styles.borderWidth]}
-                  onValueChange={([value]) => handleStyleChange('borderWidth', value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Color del borde</Label>
-                <ColorPicker
-                  color={template.styles.borderColor}
-                  onChange={(color: string) => handleColorSelect(color, 'borderColor')}
-                />
-              </div>
+                      <div className="space-y-2">
+                        <Label>Color de fondo</Label>
+                        <ColorPicker
+                          color={template.styles.backgroundColor}
+                          onChange={(color: string) => handleColorChange(color, 'backgroundColor')}
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleSection>
+
+                  {/* Border Section */}
+                  <CollapsibleSection
+                    title="Borde"
+                    isExpanded={expandedSections.border}
+                    onToggle={() => toggleSection('border')}
+                  >
+                    <div className="space-y-4">
+                      <EnhancedSlider
+                        label="Grosor del borde"
+                        value={template.styles.borderWidth}
+                        min={0}
+                        max={10}
+                        step={1}
+                        unit="px"
+                        onChange={(value) => handleStyleChange('borderWidth', value)}
+                      />
+                      
+                      <div className="space-y-2">
+                        <Label>Color del borde</Label>
+                        <ColorPicker
+                          color={template.styles.borderColor}
+                          onChange={(color: string) => handleColorSelect(color, 'borderColor')}
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleSection>
+                </div>
+              )}
+
+              {!showSliderControls && (
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Los controles de diseño están ocultos
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSliderControls(true)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Mostrar controles
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </ScrollArea>
       </div>
 
+      {/* Toggle button for sidebar */}
+      <div className="absolute top-4 left-4 z-10">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border shadow-lg"
+        >
+          {showSidebar ? (
+            <>
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Ocultar Panel
+            </>
+          ) : (
+            <>
+              <Settings className="h-4 w-4 mr-1" />
+              Mostrar Panel
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* Floating toggle button when sidebar is hidden */}
+      {!showSidebar && (
+        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowSidebar(true)}
+            className="w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 border-2 border-background"
+            title="Mostrar panel de propiedades"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
+
       {/* Vista previa del certificado */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className={`flex-1 flex items-center justify-center p-8 transition-all duration-300 ease-in-out ${!showSidebar ? 'pl-20' : ''}`}>
         <div 
           className="relative w-full max-w-3xl aspect-[1.41/1] bg-muted shadow-lg flex flex-col items-center justify-center p-12 text-center"
           style={{

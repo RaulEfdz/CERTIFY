@@ -9,7 +9,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
   const {
     title,
     backgroundUrl,
-    overlayColor = 'rgba(0, 0, 0, 0.5)',
+    overlayColor = 'rgba(255, 255, 255, 0.95)',
     customCss = '',
     customJs = '',
     logoUrl,
@@ -78,7 +78,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       --color-text-primary: #1f2937;
       --color-text-secondary: #4b5563;
       --color-bg: #ffffff;
-      --overlay-color: ${overlayColor};
+      --content-bg: ${overlayColor};
       --spacing: 1rem;
       --radius: 8px;
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -122,7 +122,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       max-width: 900px;
       width: 100%;
       text-align: center;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--content-bg);
       padding: calc(var(--spacing) * 3);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -275,7 +275,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       <h1>${safeTitle}</h1>
       
       ${safeBody1 ? `<p class="body-text">${safeBody1}</p>` : ''}
-      |
+      
       <div class="student-name">${safeStudentName}</div>
       
       ${safeBody2 ? `<p class="body-text">${safeBody2}</p>` : ''}

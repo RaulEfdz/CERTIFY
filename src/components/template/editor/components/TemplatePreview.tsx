@@ -11,9 +11,21 @@ import { toast } from 'sonner';
 interface TemplatePreviewProps {
     templateHtml: string;
     certificateSize: 'landscape' | 'square';
+    hideControls?: boolean;
+    onControlsChange?: (controls: PreviewControls) => void;
 }
 
-export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePreviewProps) => {
+export interface PreviewControls {
+    zoomLevel: number;
+    fitTo: 'width' | 'page' | 'auto';
+    isFullscreen: boolean;
+    handleZoomIn: () => void;
+    handleZoomOut: () => void;
+    handleFullscreen: () => void;
+    setFitTo: (value: 'width' | 'page' | 'auto') => void;
+}
+
+export const TemplatePreview = ({ templateHtml, certificateSize, hideControls = false, onControlsChange }: TemplatePreviewProps) => {
     const [isPreviewFullscreen, setIsPreviewFullscreen] = useState<boolean>(false);
     const [zoomLevel, setZoomLevel] = useState<number>(100);
     const [fitTo, setFitTo] = useState<'width' | 'page' | 'auto'>('width');
@@ -38,15 +50,15 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
             
             if (fitTo === 'width') {
                 // Ajustar al ancho del contenedor
-                scale = (containerRect.width * 0.9) / (certificateSize === 'landscape' ? 1200 : 900);
+                scale = (containerRect.width * 0.8) / (certificateSize === 'landscape' ? 800 : 600);
             } else if (fitTo === 'page') {
                 // Ajustar a la página (manteniendo la relación de aspecto)
                 if (containerAspect > targetAspect) {
                     // Contenedor más ancho que el certificado
-                    scale = (containerRect.height * 0.9) / 900;
+                    scale = (containerRect.height * 0.8) / 600;
                 } else {
                     // Contenedor más alto que el certificado
-                    scale = (containerRect.width * 0.9) / (certificateSize === 'landscape' ? 1200 : 900);
+                    scale = (containerRect.width * 0.8) / (certificateSize === 'landscape' ? 800 : 600);
                 }
             } else {
                 // Zoom personalizado
@@ -113,174 +125,173 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
         }
     };
 
+    // Exposer los controles al componente padre si se requiere
+    useEffect(() => {
+        if (onControlsChange) {
+            onControlsChange({
+                zoomLevel,
+                fitTo,
+                isFullscreen: isPreviewFullscreen,
+                handleZoomIn,
+                handleZoomOut,
+                handleFullscreen,
+                setFitTo: (value: 'width' | 'page' | 'auto') => {
+                    setFitTo(value);
+                    if (value === 'auto') {
+                        toast.success('Modo zoom manual activado');
+                    }
+                }
+            });
+        }
+    }, [zoomLevel, fitTo, isPreviewFullscreen, onControlsChange]);
+
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-muted/50 min-w-0">
-            <div className="border-b bg-card p-2 flex justify-between items-center">
-                <Tabs defaultValue="preview" className="w-full">
-                    <div className="flex justify-between items-center w-full">
-                        <TabsList>
-                            <TabsTrigger value="preview" className="px-4">
-                                Vista Previa
-                            </TabsTrigger>
-                            <TabsTrigger value="code" className="px-4">
-                                Código HTML
-                            </TabsTrigger>
-                        </TabsList>
-                        
-                        <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1 bg-muted rounded-md p-1">
+        <div className="flex-1 flex flex-col overflow-hidden bg-muted/30 min-w-0">
+            {!hideControls && (
+                <div className="border-b bg-background p-2 flex justify-between items-center shadow-sm">
+                    <Tabs defaultValue="preview" className="w-full">
+                        <div className="flex justify-between items-center w-full">
+                            <TabsList>
+                                <TabsTrigger value="preview" className="px-4">
+                                    Vista Previa
+                                </TabsTrigger>
+                                <TabsTrigger value="code" className="px-4">
+                                    Código HTML
+                                </TabsTrigger>
+                            </TabsList>
+                            
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 bg-muted/80 rounded-md p-1 border">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={handleZoomOut}
+                                                    className="h-8 w-8"
+                                                    disabled={fitTo !== 'auto'}
+                                                >
+                                                    <ZoomOut className="h-4 w-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Alejar (Ctrl + -)</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                    
+                                    <Select 
+                                        value={fitTo}
+                                        onValueChange={(value) => {
+                                            setFitTo(value as 'width' | 'page' | 'auto');
+                                            if (value === 'auto') {
+                                                toast.success('Modo zoom manual activado');
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-32 h-8 text-xs">
+                                            <SelectValue placeholder="Ajustar a..." />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-background">
+                                            <SelectItem value="width">Ajustar al ancho</SelectItem>
+                                            <SelectItem value="page">Ajustar a la página</SelectItem>
+                                            <SelectItem value="auto">Zoom personalizado ({zoomLevel}%)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={handleZoomIn}
+                                                    className="h-8 w-8"
+                                                    disabled={fitTo !== 'auto'}
+                                                >
+                                                    <ZoomIn className="h-4 w-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Acercar (Ctrl + +)</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
-                                                onClick={handleZoomOut}
+                                                onClick={handleFullscreen}
                                                 className="h-8 w-8"
-                                                disabled={fitTo !== 'auto'}
                                             >
-                                                <ZoomOut className="h-4 w-4" />
+                                                {isPreviewFullscreen ? (
+                                                    <Minimize2 className="h-4 w-4" />
+                                                ) : (
+                                                    <Maximize2 className="h-4 w-4" />
+                                                )}
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>Alejar (Ctrl + -)</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                                
-                                <Select 
-                                    value={fitTo}
-                                    onValueChange={(value) => {
-                                        setFitTo(value as 'width' | 'page' | 'auto');
-                                        if (value === 'auto') {
-                                            toast.success('Modo zoom manual activado');
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger className="w-32 h-8 text-xs">
-                                        <SelectValue placeholder="Ajustar a..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="width">Ajustar al ancho</SelectItem>
-                                        <SelectItem value="page">Ajustar a la página</SelectItem>
-                                        <SelectItem value="auto">Zoom personalizado ({zoomLevel}%)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                onClick={handleZoomIn}
-                                                className="h-8 w-8"
-                                                disabled={fitTo !== 'auto'}
-                                            >
-                                                <ZoomIn className="h-4 w-4" />
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>Acercar (Ctrl + +)</p>
+                                            {isPreviewFullscreen ? 'Salir de pantalla completa (F11)' : 'Pantalla completa (F11)'}
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
                             </div>
-                            
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            onClick={handleFullscreen}
-                                            className="h-8 w-8"
-                                        >
-                                            {isPreviewFullscreen ? (
-                                                <Minimize2 className="h-4 w-4" />
-                                            ) : (
-                                                <Maximize2 className="h-4 w-4" />
-                                            )}
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {isPreviewFullscreen ? 'Salir de pantalla completa (F11)' : 'Pantalla completa (F11)'}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                        </div>
+                    </Tabs>
+                </div>
+            )}
+            
+            {/* Vista previa del certificado - siempre visible */}
+            <div className="flex-1 overflow-hidden">
+                <div
+                    ref={previewContainerRef}
+                    className={cn(
+                        'h-full overflow-auto bg-gradient-to-br from-muted/20 to-muted/30 p-4',
+                        isPreviewFullscreen ? 'fixed inset-0 z-50 bg-background' : '',
+                        'flex items-center justify-center',
+                        'min-w-0'
+                    )}
+                >
+                    <div className="relative w-full h-full flex items-center justify-center min-w-0">
+                        <div
+                            className={cn(
+                                'bg-white shadow-xl rounded-lg overflow-hidden border border-border/50',
+                                'transition-transform duration-200',
+                                'flex items-center justify-center',
+                                'origin-center',
+                                {
+                                    'aspect-[4/3]': certificateSize === 'landscape',
+                                    'aspect-square': certificateSize === 'square',
+                                }
+                            )}
+                            style={{
+                                width: certificateSize === 'landscape' ? '800px' : '600px',
+                                height: '600px',
+                                maxWidth: '90%',
+                                maxHeight: '70vh',
+                                transform: 'none',
+                                transformOrigin: 'center center'
+                            }}
+                        >
+                            <iframe
+                                ref={iframeRef}
+                                srcDoc={templateHtml}
+                                className="border-0 w-full h-full rounded-lg"
+                                title="Vista Previa del Certificado"
+                                sandbox="allow-same-origin allow-scripts"
+                                style={{
+                                    backgroundColor: 'white'
+                                }}
+                            />
                         </div>
                     </div>
-                    
-                    <TabsContent value="preview" className="m-0 h-[calc(100vh-120px)]">
-                        <div
-                            ref={previewContainerRef}
-                            className={cn(
-                                'h-full overflow-auto bg-gradient-to-br from-muted/20 to-muted/30 p-2',
-                                isPreviewFullscreen ? 'fixed inset-0 z-50 bg-background' : '',
-                                'flex items-center justify-center',
-                                'min-w-0'
-                            )}
-                        >
-                            <div className="relative w-full h-full flex items-center justify-center min-w-0">
-                                <div
-                                    className={cn(
-                                        'bg-muted shadow-xl rounded-lg overflow-hidden border border-border/50',
-                                        'transition-transform duration-200',
-                                        'flex items-center justify-center',
-                                        'origin-center',
-                                        {
-                                            'w-full h-full': fitTo === 'page',
-                                            'w-full max-w-5xl': fitTo !== 'page',
-                                            'aspect-[4/3]': certificateSize === 'landscape',
-                                            'aspect-square': certificateSize === 'square',
-                                            'max-w-full': true,
-                                            'max-h-[80vh]': true
-                                        }
-                                    )}
-                                    style={{
-                                        width: certificateSize === 'landscape' ? '1200px' : '900px',
-                                        height: '900px',
-                                        maxWidth: '100%',
-                                        maxHeight: '80vh',
-                                        transform: 'none',
-                                        transformOrigin: 'center center',
-                                        overflow: 'auto'
-                                    }}
-                                >
-                                    <iframe
-                                        ref={iframeRef}
-                                        srcDoc={templateHtml}
-                                        className={cn(
-                                            'border-0',
-                                            'bg-muted',
-                                            'w-full h-full',
-                                            'overflow-auto',
-                                            'rounded-lg'
-                                        )}
-                                        title="Vista Previa del Certificado"
-                                        sandbox="allow-same-origin allow-scripts"
-                                        style={{
-                                            maxWidth: '100%',
-                                            maxHeight: '80vh',
-                                            minWidth: 0,
-                                            minHeight: 0
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="code" className="m-0 h-[calc(100vh-120px)]">
-                        <div className="h-full overflow-auto bg-background p-4">
-                            <pre className="bg-muted p-4 rounded-md overflow-auto h-full">
-                                <code className="text-sm">
-                                    {templateHtml}
-                                </code>
-                            </pre>
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                </div>
             </div>
         </div>
     );

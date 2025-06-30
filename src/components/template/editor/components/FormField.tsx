@@ -6,15 +6,22 @@ export const FormField = ({
   label, 
   children, 
   error,
+  description,
   className = ''
 }: { 
   label: string; 
   children: React.ReactNode;
   error?: string;
+  description?: string;
   className?: string;
 }) => (
   <div className={cn("space-y-2", className)}>
-    <Label className="text-sm font-medium text-foreground/90">{label}</Label>
+    <div>
+      <Label className="text-sm font-medium text-foreground/90">{label}</Label>
+      {description && (
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+      )}
+    </div>
     {children}
     {error && (
       <div className="flex items-center text-sm text-destructive">

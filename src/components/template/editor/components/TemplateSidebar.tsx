@@ -48,62 +48,63 @@ interface TemplateSidebarProps {
 
 
 export const TemplateSidebar = ({ state, setters }: TemplateSidebarProps) => (
-    <div className="w-full md:w-96 border-r overflow-y-auto bg-card max-h-[60vh] md:max-h-none">
-        <div className="p-4 space-y-6">
-            <h2 className="text-lg font-semibold">Configuración</h2>
-            <Accordion type="multiple" defaultValue={['size', 'logo', 'content', 'background']}>
-                <AccordionItem value="size">
-                    <AccordionTrigger>
+    <div className="w-full h-full">
+        <Accordion type="multiple" defaultValue={['size']} className="px-3">
+                <AccordionItem value="size" className="border-b-0">
+                    <AccordionTrigger className="py-3 text-sm">
                         <div className="flex items-center">
                             <Settings2 className="h-4 w-4 mr-2" />
                             <span>Tamaño del Certificado</span>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <Card>
-                            <CardContent className="p-4">
-                                <SizeToggle 
-                                    value={state.certificateSize} 
-                                    onChange={setters.setCertificateSize} 
-                                />
-                            </CardContent>
-                        </Card>
+                        <div className="pb-3">
+                            <SizeToggle 
+                                value={state.certificateSize} 
+                                onChange={setters.setCertificateSize} 
+                            />
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="logo">
-                    <AccordionTrigger>
+                <AccordionItem value="logo" className="border-b-0">
+                    <AccordionTrigger className="py-3 text-sm">
                         <div className="flex items-center">
                             <ImageIcon className="h-4 w-4 mr-2" />
                             <span>Logo</span>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <LogoSettings state={state} setters={setters} />
+                        <div className="pb-3">
+                            <LogoSettings state={state} setters={setters} />
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="content">
-                    <AccordionTrigger>
+                <AccordionItem value="content" className="border-b-0">
+                    <AccordionTrigger className="py-3 text-sm">
                         <div className="flex items-center">
                             <TypeIcon className="h-4 w-4 mr-2" />
                             <span>Contenido</span>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <ContentSettings state={state} setters={setters} />
+                        <div className="pb-3">
+                            <ContentSettings state={state} setters={setters} />
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="background">
-                    <AccordionTrigger>
+                <AccordionItem value="background" className="border-b-0">
+                    <AccordionTrigger className="py-3 text-sm">
                         <div className="flex items-center">
                             <ImagePlus className="h-4 w-4 mr-2" />
                             <span>Fondo</span>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <BackgroundSettings state={state} setters={setters} />
+                        <div className="pb-3">
+                            <BackgroundSettings state={state} setters={setters} />
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-        </div>
     </div>
 );

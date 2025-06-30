@@ -50,7 +50,7 @@ export const INITIAL_CONFIG: TemplateConfig = {
     studentName: 'Nombre del Estudiante',
     directorName: 'Firma del Director',
     signatures: [DEFAULT_SIGNATURE, DEFAULT_SIGNATURE],
-    overlayColor: 'transparent',
+    overlayColor: 'rgba(255, 255, 255, 0.95)',
     certificateSize: 'landscape' as CertificateSize,
     titleColor: '#111827',
     bodyColor: '#374151',

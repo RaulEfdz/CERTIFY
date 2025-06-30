@@ -9,13 +9,7 @@ const TemplateEditor = dynamic<{}>(
 
 export default function CertificateEditorPage() {
   return (
-    <div className="h-screen flex flex-col bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-semibold">Editor de Plantilla de Certificado</h1>
-        </div>
-      </header>
-      
+    <div className="h-full flex flex-col bg-background">
       <main className="flex-1 overflow-hidden">
         <TemplateEditor />
       </main>
