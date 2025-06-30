@@ -16,7 +16,7 @@ export function ImprovedTemplateEditor() {
     <TooltipProvider>
       <div className="flex h-screen bg-background">
         {/* Sidebar lateral fijo, visible desde md en adelante */}
-        <aside className="hidden md:flex w-64 flex-shrink-0 flex-col border-r bg-card overflow-y-auto">
+        <aside className="hidden md:flex w-auto flex-shrink-0 flex-col border-r bg-card overflow-y-auto">
           <TemplateSidebar state={state} setters={state} />
         </aside>
 
@@ -29,12 +29,10 @@ export function ImprovedTemplateEditor() {
 
           {/* Contenido central: preview */}
           <div className="flex flex-1 overflow-hidden">
-            <div className="flex-1 p-0 md:p-6 flex items-center justify-center bg-muted/40 min-w-0 mx-auto overflow-auto">
               <TemplatePreview
                 templateHtml={templateHtml}
                 certificateSize={state.certificateSize}
               />
-            </div>
           </div>
         </main>
       </div>
