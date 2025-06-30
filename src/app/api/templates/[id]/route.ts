@@ -1,16 +1,17 @@
 // src/app/api/templates/[id]/route.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { getServerSession } from "next-auth";
-import { supabase } from '@/lib/supabase/client';
+import { NextResponse } from "next/server";
+import { createServerClient } from '@/lib/supabase/server';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,7 +20,7 @@ export async function GET(
     .from('templates')
     .select('*')
     .eq('id', id)
-    .eq('userId', session.user.id)
+    .eq('userId', user.id)
     .single();
 
   if (error) {
@@ -32,12 +33,14 @@ export async function GET(
   return NextResponse.json(data);
 }
 
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -48,7 +51,7 @@ export async function PUT(
     .from('templates')
     .update({ name, content })
     .eq('id', id)
-    .eq('userId', session.user.id)
+    .eq('userId', user.id)
     .select()
     .single();
 
@@ -59,12 +62,14 @@ export async function PUT(
   return NextResponse.json(data);
 }
 
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -73,7 +78,7 @@ export async function DELETE(
     .from('templates')
     .delete()
     .eq('id', id)
-    .eq('userId', session.user.id);
+    .eq('userId', user.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
