@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { ThemeProviderProps } from "next-themes/dist/types";
+// import { ThemeProviderProps } from "next-themes"; // Not exported by next-themes
+// Use inline typing or 'any' for ThemeProviderProps if needed
+type ThemeProviderProps = any;
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { OrganizationProvider } from "@/contexts/organization-context";

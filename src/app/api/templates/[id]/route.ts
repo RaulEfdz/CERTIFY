@@ -1,63 +1,83 @@
-import { auth } from "@/app/api/auth/[...nextauth]/route"
-import { PrismaClient } from "@prisma/client"
-import { NextResponse } from "next/server"
-
-const prisma = new PrismaClient()
+// src/app/api/templates/[id]/route.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { getServerSession } from "next-auth";
+import { supabase } from '@/lib/supabase/client';
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth()
-
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const template = await prisma.template.findFirst({
-    where: { id: params.id, userId: session.user.id },
-  })
+  const { id } = await params;
+  const { data, error } = await supabase
+    .from('templates')
+    .select('*')
+    .eq('id', id)
+    .eq('userId', session.user.id)
+    .single();
 
-  if (!template) {
-    return NextResponse.json({ error: "Not Found" }, { status: 404 })
+  if (error) {
+    if (error.code === 'PGRST116') { // Not found
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json(template)
+  return NextResponse.json(data);
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth()
-
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, content } = await req.json()
+  const { id } = await params;
+  const { name, content } = await req.json();
 
-  const template = await prisma.template.updateMany({
-    where: { id: params.id, userId: session.user.id },
-    data: { name, content },
-  })
+  const { data, error } = await supabase
+    .from('templates')
+    .update({ name, content })
+    .eq('id', id)
+    .eq('userId', session.user.id)
+    .select()
+    .single();
 
-  return NextResponse.json(template)
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  return NextResponse.json(data);
 }
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth()
-
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await prisma.template.deleteMany({
-    where: { id: params.id, userId: session.user.id },
-  })
+  const { id } = await params;
+  const { error } = await supabase
+    .from('templates')
+    .delete()
+    .eq('id', id)
+    .eq('userId', session.user.id);
 
-  return new Response(null, { status: 204 })
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  return new Response(null, { status: 204 });
 }

@@ -30,7 +30,7 @@ export const usePreviewState = (templateHtml: string) => {
         return Array.from(uniqueVariables);
     }, [templateHtml]);
 
-    const { groupedVariables, missingVariables } = useMemo(() => {
+    const memoized = useMemo((): { groupedVariables: Record<string, string[]>; missingVariables: string[] } => {
         const groups: { [key: string]: string[] } = {};
         let parsedData = {};
         try {
@@ -55,8 +55,11 @@ export const usePreviewState = (templateHtml: string) => {
             }
         });
 
-        return { groupedVariables, missingVariables };
-    }, [detectedVariables, jsonData]);
+        return { groupedVariables: groups, missingVariables: missing };
+    }, [jsonData, detectedVariables]);
+
+    const groupedVariables: Record<string, string[]> = memoized.groupedVariables;
+    const missingVariables: string[] = memoized.missingVariables;
 
     const handleGenerateData = useCallback(async () => {
         if (detectedVariables.length === 0) {

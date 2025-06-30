@@ -13,8 +13,8 @@ export async function POST(request: Request) {
       )
     }
 
-    const cookieStore = cookies()
-    const supabase = await createSupabaseServerClient(cookieStore)
+    // const cookieStore = cookies()
+    const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase.auth.signUp({
       email,
       password,

@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
 
-export const RenderedPreview = ({ renderedHtml }) => {
+interface RenderedPreviewProps {
+  renderedHtml: string;
+}
+
+export const RenderedPreview = ({ renderedHtml }: RenderedPreviewProps) => {
     const [zoom, setZoom] = useState(0.7);
 
     return (

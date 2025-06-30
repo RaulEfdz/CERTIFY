@@ -11,8 +11,7 @@ export async function inviteUserToOrganization(
   email: string,
   role: OrganizationRole
 ): Promise<{ success: boolean; error?: string }> {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   try {
     // 1. Verificar si el usuario actual tiene permiso para invitar

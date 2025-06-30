@@ -6,6 +6,9 @@ export interface SignatureData {
 export type CertificateSize = 'square' | 'landscape';
 
 export interface TemplateConfig {
+    orientation: string;
+    date?: string;
+    dateLocale?: string;
     logoUrl: string;
     logoWidth: number;
     logoHeight: number;
@@ -14,6 +17,8 @@ export interface TemplateConfig {
     body1: string;
     body2: string;
     courseName: string;
+    studentName: string;
+    directorName?: string;
     signatures: SignatureData[];
     overlayColor: string;
     certificateSize: CertificateSize;
@@ -42,6 +47,8 @@ export const INITIAL_CONFIG: TemplateConfig = {
     body1: 'Este certificado se presenta con orgullo a',
     body2: 'por haber completado exitosamente el curso',
     courseName: 'Desarrollo Web Avanzado',
+    studentName: 'Nombre del Estudiante',
+    directorName: 'Firma del Director',
     signatures: [DEFAULT_SIGNATURE, DEFAULT_SIGNATURE],
     overlayColor: 'transparent',
     certificateSize: 'landscape' as CertificateSize,
@@ -49,4 +56,5 @@ export const INITIAL_CONFIG: TemplateConfig = {
     bodyColor: '#374151',
     customCss: '',
     customJs: '',
+    orientation: 'landscape',
 };

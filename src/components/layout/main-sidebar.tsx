@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { SignOutButton } from "../auth/sign-out-button";
 
 type User = {
@@ -33,7 +33,6 @@ export function MainSidebar() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     const getUser = async () => {

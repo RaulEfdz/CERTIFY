@@ -4,8 +4,7 @@ import { redirect } from "next/navigation";
 import { InviteMemberForm } from "./form";
 
 export default async function InviteMemberPage() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
   
   // Verificar que el usuario esté autenticado
   const { data: { user }, error: authError } = await supabase.auth.getUser();

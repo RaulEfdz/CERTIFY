@@ -1,22 +1,19 @@
 
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { AcceptInvitationClient } from "./client";
 
 export default async function AcceptInvitationPage({ 
   searchParams 
 }: { 
-  searchParams: { token?: string }
+  searchParams: Promise<{ token?: string }>
 }) {
-  const { token } = searchParams;
+  const { token } = await searchParams;
 
   if (!token) {
     return <div>Token de invitación no válido o no proporcionado.</div>;
   }
 
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   // 1. Validar el token en el servidor
   const { data: invitation, error } = await supabase
@@ -40,11 +37,15 @@ export default async function AcceptInvitationPage({
   // 2. Verificar si el usuario está logueado
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Pasamos los datos al componente de cliente para que maneje la acción
+  if (!user || !user.email) {
+    return <div>Debes iniciar sesión con un usuario válido para aceptar la invitación.</div>;
+  }
+
+  // Pasamos los datos al componente de cliente para que maneje la acción, asegurando que email nunca sea undefined
   return (
     <div className="container mx-auto flex items-center justify-center min-h-screen">
       <AcceptInvitationClient 
-        user={user}
+        user={{ ...user, email: user.email ?? "" }}
         invitation={invitation}
         organizationName={invitation.organizations?.name || "una organización"}
       />

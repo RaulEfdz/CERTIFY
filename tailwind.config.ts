@@ -1,6 +1,6 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss'
 
-const config = {
+const config: Config = {
   darkMode: ['class'],
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
@@ -12,151 +12,75 @@ const config = {
         headline: ['Space Grotesk', 'sans-serif'],
         code: ['monospace'],
       },
-
       colors: {
-        /**
-         * GOLD COLOR PALETTE
-         * Used for: Buttons, accents, highlights, and important interactive elements
-         * - 50-200: Light backgrounds, subtle highlights
-         * - 300-400: Hover states, secondary buttons
-         * - 500: Primary gold (DEFAULT) - Main buttons, primary actions
-         * - 600-900: Darker shades for text on light bg, pressed states
-         * - light: Light gold for highlights
-         * - dark: Dark gold for shadows and borders
-         */
-        gold: {
-          50:  '#FFFDF9',  // Lightest - for text on dark backgrounds
-          100: '#FEF8F0', // Very light - for subtle highlights
-          200: '#FDF2E1', // Light - for hover states
-          300: '#FBE5C3', // Light medium - for secondary actions
-          400: '#F8D9A5', // Medium - for interactive elements
-          500: '#F5CC87', // Base - primary gold for text/icons
-          600: '#E5B63A', // Brighter - for important elements
-          700: '#B08C38', // Base gold - for buttons
-          800: '#8D702D', // Darker - for hover states
-          900: '#6A5422', // Dark - for pressed states
-          DEFAULT: '#F5CC87', // Brighter gold for better visibility
-          light: '#F8E6C4',   // Very light gold for text
-          dark:  '#B08C38',   // Standard gold for UI elements
-        },
-        
-        /**
-         * GREEN COLOR PALETTE
-         * Used for: Backgrounds, UI elements, and text
-         * - 50-200: Light backgrounds, cards
-         * - 300-400: Borders, subtle UI elements
-         * - 500: Main brand green - matches logo background
-         * - 600-900: Text colors, dark UI elements
-         * - logo: Direct reference to logo background color
-         */
-        green: {
-          50:  '#E8F0EB',  // Lightest - for text on dark backgrounds
-          100: '#D1E1D7', // Very light - for subtle text
-          200: '#A3C3AF', // Light - for secondary text
-          300: '#75A587', // Light medium - for subtle UI elements
-          400: '#47875F', // Medium - for accents
-          500: '#0d2215', // Main background color
-          600: '#0A1B10', // Slightly darker - for hover states
-          700: '#08150D', // Darker - for pressed states
-          800: '#050E09', // Very dark - for deep shadows
-          900: '#030804', // Darkest - for deepest elements
-          darkest: '#020503', // Darkest - almost black
-          dark: '#0A1B10',    // Dark - for UI elements
-          light: '#A3C3AF',   // Light green for text
-          logo: '#0D2215',    // Main background color
-        },
-        // Theme colors
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
+        background: '#111111', // Fondo oscuro
+        graybackground: '#1a1a1a', // Alternativa para secciones
+        foreground: '#ffffff', // Texto principal blanco
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: '#23272e',   // Gris oscuro para fondos secundarios
+          foreground: '#bdbdbd' // Gris claro para descripciones
         },
+        border: '#333842',      // Gris oscuro para bordes
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: '#00b894',   // Verde acento
+          foreground: '#ffffff' // Texto blanco sobre acento
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: '#ef4444',   // Rojo para errores
+          foreground: '#ffffff'
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        chart: {
-          '1': 'hsl(var(--chart-1))',
-          '2': 'hsl(var(--chart-2))',
-          '3': 'hsl(var(--chart-3))',
-          '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))',
+        gray: {
+          50:  '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
-        sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-          border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
+        // Paleta verde ampliada
+        verde: {
+          darkest: '#001A14',
+          900: '#022C22',
+          800: '#064E3B',
+          700: '#065F46',
+          600: '#047857',
+          500: '#059669',
+          dark:   '#047857',
+          light:  '#A7F3D0',
+          logo:   '#059669',
         },
       },
       boxShadow: {
-        // Professional shadows
-        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        sm:      '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
         DEFAULT: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'md': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'lg': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        'xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-        'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
-        // Gold accents
-        'gold': '0 4px 14px 0 rgba(176, 140, 56, 0.3)',
-        'gold-lg': '0 10px 25px -5px rgba(176, 140, 56, 0.2), 0 8px 10px -6px rgba(176, 140, 56, 0.2)',
-        'inner-gold': 'inset 0 2px 4px 0 rgba(109, 82, 33, 0.5)',
+        md:      '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        lg:      '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        xl:      '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        '2xl':   '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+        inner:   'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       },
-
       keyframes: {
         shine: {
           '0%, 100%': { 'background-position': '0% 50%' },
-          '50%': { 'background-position': '100% 50%' },
+          '50%':      { 'background-position': '100% 50%' },
         },
         'accordion-down': {
-          from: {
-            height: '0',
-          },
-          to: {
-            height: 'var(--radix-accordion-content-height)',
-          },
+          from: { height: '0' },
+          to:   { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
-          from: {
-            height: 'var(--radix-accordion-content-height)',
-          },
-          to: {
-            height: '0',
-          },
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to:   { height: '0' },
         },
       },
       backgroundImage: {
-        'gold-gradient': 'linear-gradient(135deg, #FFE066 0%, #D4AF37 50%, #B08E2E 100%)',
-        'gold-gradient-light': 'linear-gradient(135deg, #FFF5CC 0%, #FFE066 50%, #D4AF37 100%)',
+        'gold-gradient-light':  'linear-gradient(135deg, #FEF3C7 0%, #FBBF24 50%, #F59E0B 100%)',
+        'green-gradient':       'linear-gradient(135deg, #34D399 0%, #059669 50%, #047857 100%)',
+        'green-gradient-light': 'linear-gradient(135deg, #D1FAE5 0%, #34D399 50%, #059669 100%)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -164,14 +88,16 @@ const config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       animation: {
-        'shine': 'shine 3s ease-in-out infinite',
-        'pulse-gold': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        shine:          'shine 3s ease-in-out infinite',
+        'pulse-gold':   'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'accordion-down':'accordion-down 0.2s ease-out',
+        'accordion-up':  'accordion-up 0.2s ease-out',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
-} as const;
+  plugins: [
+    require('tailwindcss-animate'),
+  ],
+}
 
-export default config;
+export default config

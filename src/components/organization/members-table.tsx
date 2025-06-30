@@ -135,7 +135,7 @@ export function MembersTable({
               <TableCell className="font-medium">
                 <div className="flex items-center space-x-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                    <Icons.mail className="h-4 w-4" />
+                    <Icons.logo className="h-4 w-4" />
                   </div>
                   <div>
                     <div className="font-medium">

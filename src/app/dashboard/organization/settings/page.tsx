@@ -5,8 +5,7 @@ import { OrganizationForm } from "./organization-form";
 import { PageHeader } from "@/components/organization/page-header";
 
 export default async function OrganizationSettingsPage() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
   
   // Verificar que el usuario esté autenticado
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -71,7 +70,7 @@ export default async function OrganizationSettingsPage() {
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Esta acción no se puede deshacer. Esto eliminará permanentemente la organización y todos sus datos.
                   </p>
-                  <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                  <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-destructive-foreground bg-destructive hover:bg-destructive/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-destructive">
                     Eliminar Organización
                   </button>
                 </div>

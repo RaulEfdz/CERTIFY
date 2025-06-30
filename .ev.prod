@@ -1,0 +1,18 @@
+#google
+GEMINI_API_KEY=AIzaSyDiCppcsy4mM8GauW7TnnYbO9Dw-pXpKSs
+
+#cloudinary
+CLOUDINARY_CLOUD_NAME=deuos3ssm
+CLOUDINARY_API_KEY=831188196434165
+CLOUDINARY_API_SECRET=YLsIVlj2gOm4hX_2N0qXTzaiVOA
+CLOUDINARY_URL=CLOUDINARY_URL=cloudinary://831188196434165:YLsIVlj2gOm4hX_2N0qXTzaiVOA@deuos3ssm
+# Cloudinary Configuration
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=deuos3ssm
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=CERTIFY
+
+#db supabase
+SUPABASE_PASSWORD=YBZYMOMXGFr32VDt
+DATABASE_URL=postgresql://postgres.tocdfckdwthcxkynqdly:YBZYMOMXGFr32VDt@aws-0-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true
+DIRECT_URL=postgresql://postgres.tocdfckdwthcxkynqdly:YBZYMOMXGFr32VDt@aws-0-us-east-2.pooler.supabase.com:5432/postgres
+NEXT_PUBLIC_SUPABASE_URL=https://tocdfckdwthcxkynqdly.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvY2RmY2tkd3RoY3hreW5xZGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc2NTIsImV4cCI6MjA2NjU3MzY1Mn0.bJjYZ2jpM38blw_mbQCfdDLNPlDnT4XdinQNPCYTNmk

@@ -14,13 +14,12 @@ const InviteMemberForm = ({ organizationId }: { organizationId: string }) => (
   <div>{/* Formulario para invitar nuevos miembros */}</div>
 );
 
-const MembersList = ({ members }: { members: (OrganizationMember & { profiles: Profile | null })[] }) => (
+const MembersList = ({ members   }: { members: (OrganizationMember & { profiles: Profile | null })[] }) => (
   <div>{/* Tabla con la lista de miembros */}</div>
 );
 
 export default async function OrganizationPage() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {

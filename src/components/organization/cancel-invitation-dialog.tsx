@@ -61,7 +61,7 @@ export function CancelInvitationDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="h-8">
-          <Icons.x className="h-4 w-4" />
+          <Icons.logo className="h-4 w-4" />
           <span className="sr-only">Cancelar invitación</span>
         </Button>
       </DialogTrigger>

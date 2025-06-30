@@ -21,7 +21,7 @@ type OrganizationInvitation = {
 
 type User = {
   id: string;
-  email: string;
+  email: string | undefined;
 } | null;
 
 export function AcceptInvitationClient({

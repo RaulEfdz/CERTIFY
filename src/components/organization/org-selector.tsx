@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +24,6 @@ interface Organization {
 
 export function OrganizationSelector() {
   const router = useRouter();
-  const supabase = createClient();
   
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
@@ -44,7 +43,7 @@ export function OrganizationSelector() {
           .eq('user_id', user.id);
 
         if (memberships) {
-          const orgs = memberships.map(m => m.organizations);
+          const orgs = memberships.flatMap(m => m.organizations);
           setOrganizations(orgs as Organization[]);
 
           // Obtener la organización actual del perfil
@@ -118,7 +117,7 @@ export function OrganizationSelector() {
   if (organizations.length === 0) {
     return (
       <Button variant="ghost" className="justify-start gap-2 w-full">
-        <Icons.building className="h-4 w-4" />
+        <Icons.logo className="h-4 w-4" />
         <span>Sin organización</span>
       </Button>
     );
@@ -136,7 +135,7 @@ export function OrganizationSelector() {
               </AvatarFallback>
             </Avatar>
           ) : (
-            <Icons.building className="h-4 w-4" />
+            <Icons.logo className="h-4 w-4" />
           )}
           <span className="truncate">{currentOrg?.name || "Seleccionar organización"}</span>
           <Icons.chevronDown className="ml-auto h-4 w-4 opacity-50" />
@@ -161,11 +160,11 @@ export function OrganizationSelector() {
                 </AvatarFallback>
               </Avatar>
             ) : (
-              <Icons.building className="h-4 w-4 mr-2" />
+              <Icons.logo className="h-4 w-4 mr-2" />
             )}
             <span className="truncate">{org.name}</span>
             {org.id === currentOrg?.id && (
-              <Icons.check className="ml-auto h-4 w-4 text-primary" />
+              <Icons.logo className="ml-auto h-4 w-4 text-primary" />
             )}
           </DropdownMenuItem>
         ))}

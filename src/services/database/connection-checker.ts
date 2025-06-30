@@ -1,11 +1,12 @@
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { Database, ConnectionStatus } from '@/types/supabase'
 
-
-
+/**
+ * Clase para verificar la conexión con la base de datos.
+ * Utiliza el cliente de Supabase para realizar las comprobaciones.
+ */
 export class DatabaseConnectionChecker {
   private static instance: DatabaseConnectionChecker
-  private supabase = createClient()
   private lastCheck: Date | null = null
   private status: ConnectionStatus = {
     connected: false,
@@ -26,12 +27,12 @@ export class DatabaseConnectionChecker {
       this.lastCheck = new Date()
       
       // Verificar conexión básica
-      const { data, error } = await this.supabase.rpc('version')
+      const { data, error } = await supabase.rpc('version')
       
       if (error) throw error
 
       // Obtener lista de tablas
-      const { data: tablesData, error: tablesError } = await this.supabase
+      const { data: tablesData, error: tablesError } = await supabase
         .from('pg_tables')
         .select('tablename')
         .eq('schemaname', 'public')

@@ -28,6 +28,7 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
   const { toast } = useToast();
   const [showResizeModal, setShowResizeModal] = useState(false);
   const [oversizedFile, setOversizedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const readFileAsDataUrl = (file: File) => {
     const reader = new FileReader();
@@ -96,6 +97,7 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
             ctx.drawImage(img, 0, 0, width, height);
             const dataUrl = canvas.toDataURL(oversizedFile.type, 0.8);
             onUpload(dataUrl);
+            setPreview(dataUrl);
             toast({
               title: "Imagen Comprimida y Subida",
               description: "La imagen ha sido redimensionada y añadida.",
@@ -116,16 +118,30 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
   };
 
   return (
-    <>
-      <div className={cn("space-y-2", className)}>
-        <Input
-          type="file"
-          ref={inputRef}
-          onChange={handleFileChange}
-          className="hidden"
-          accept="image/png, image/jpeg, image/gif, image/svg+xml"
-        />
-        <Button variant="outline" onClick={handleClick} className="w-full">
+    <div className={cn("flex flex-col gap-4", className)}>
+      <Input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <div className="flex flex-col items-center gap-2">
+        {preview && (
+          <div className="relative w-32 h-32 border rounded-md overflow-hidden">
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => inputRef.current?.click()}
+          className="w-full bg-white"
+        >
           <Upload className="mr-2 h-4 w-4" /> {label}
         </Button>
       </div>
@@ -149,6 +165,6 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }

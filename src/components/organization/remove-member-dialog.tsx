@@ -68,7 +68,7 @@ export function RemoveMemberDialog({
           className="h-8 text-red-600 hover:text-red-800 hover:bg-red-50"
           disabled={disabled}
         >
-          <Icons.userX className="h-4 w-4" />
+          <Icons.users className="h-4 w-4" />
           <span className="sr-only">Eliminar miembro</span>
         </Button>
       </DialogTrigger>

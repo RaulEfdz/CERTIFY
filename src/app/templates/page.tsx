@@ -11,10 +11,10 @@ export default function TemplatesPage() {
         <div className="mx-auto flex h-24 w-24 items-center justify-center mb-6">
           <img src="/logo.png" alt="Certify Logo" className="h-full w-full object-contain" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
           No hay plantillas aún
         </h1>
-        <p className="text-lg text-white mb-8">
+        <p className="text-lg text-muted-foreground mb-8">
           Crea tu primera plantilla de certificado personalizado para empezar a emitir certificados digitales.
         </p>
         
@@ -26,7 +26,7 @@ export default function TemplatesPage() {
                 <PlusCircle className="mr-2 h-5 w-5" /> Crear plantilla
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary" className="bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white">
+            <Button asChild size="lg" variant="secondary" className="bg-muted/10 hover:bg-muted/20 border-muted/20 text-foreground hover:text-foreground">
               <Link href="#">
                 <FileText className="mr-2 h-5 w-5" /> Ver ejemplos
               </Link>

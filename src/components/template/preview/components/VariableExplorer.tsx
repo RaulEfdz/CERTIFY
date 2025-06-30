@@ -4,7 +4,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Variable, AlertCircle } from "lucide-react";
 
-export const VariableExplorer = ({ detectedVariables, groupedVariables, missingVariables }) => (
+interface VariableExplorerProps {
+  detectedVariables: string[];
+  groupedVariables: Record<string, string[]>;
+  missingVariables: string[];
+}
+
+export const VariableExplorer = ({ detectedVariables, groupedVariables, missingVariables }: VariableExplorerProps) => (
     <div className="flex flex-col gap-2 flex-1 min-h-0">
         <h3 className="text-sm font-medium flex items-center gap-2"><Variable className="h-4 w-4"/> Variables Detectadas</h3>
         {missingVariables.length > 0 && (

@@ -1,3 +1,4 @@
+'use client';
 import dynamic from 'next/dynamic';
 
 // Dynamically import the editor with SSR disabled since it uses browser APIs

@@ -10,7 +10,9 @@ import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/use-auth'
 import { ErrorDialog } from '@/components/ui/error-dialog'
 
-export default function LoginPage() {
+import { Suspense } from "react";
+
+function LoginPageContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -133,24 +135,23 @@ export default function LoginPage() {
         open={showVerificationSent}
         onOpenChange={setShowVerificationSent}
         title="Verificación de correo requerida"
-        description={
-          <div className="space-y-4">
-            <div className="text-sm text-foreground">
-              Tu correo electrónico no ha sido verificado. Por favor, revisa tu bandeja de entrada y haz clic en el enlace de verificación.
-            </div>
-            <div className="text-sm text-foreground">
-              ¿No recibiste el correo?
-            </div>
-            <Button 
-              onClick={handleResendVerification}
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? 'Enviando...' : 'Reenviar correo de verificación'}
-            </Button>
+      >
+        <div className="space-y-4">
+          <div className="text-sm text-foreground">
+            Tu correo electrónico no ha sido verificado. Por favor, revisa tu bandeja de entrada y haz clic en el enlace de verificación.
           </div>
-        }
-      />
+          <div className="text-sm text-foreground">
+            ¿No recibiste el correo?
+          </div>
+          <Button 
+            onClick={handleResendVerification}
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isLoading ? 'Enviando...' : 'Reenviar correo de verificación'}
+          </Button>
+        </div>
+      </ErrorDialog>
       
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Title */}
@@ -266,4 +267,12 @@ export default function LoginPage() {
       </div>
     </div>
   )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <LoginPageContent />
+    </Suspense>
+  );
 }

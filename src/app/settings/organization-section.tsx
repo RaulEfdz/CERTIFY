@@ -14,8 +14,8 @@ export function OrganizationSection() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Organización</h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <h3 className="text-lg font-medium text-foreground">Organización</h3>
+          <p className="text-sm text-muted-foreground mt-1">
             Gestiona la información y miembros de tu organización
           </p>
         </div>
@@ -40,7 +40,7 @@ export function OrganizationSection() {
       </div>
 
       {isCreating && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-border bg-background p-6 shadow-sm">
           <CreateOrganizationForm 
             onSuccess={() => {
               setIsCreating(false);

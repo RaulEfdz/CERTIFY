@@ -1,4 +1,4 @@
-import { type LucideProps } from "lucide-react";
+import { type LucideProps, UserPlus } from "lucide-react";
 
 type Icon = (props: LucideProps) => JSX.Element;
 
@@ -193,5 +193,6 @@ export const Icons = {
       <path d="M5 12h14" />
       <path d="M12 5v14" />
     </svg>
-  )
+  ),
+  userPlus: UserPlus
 }

@@ -4,10 +4,10 @@ import { NextResponse } from 'next/server';
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { memberId: string } }
+  { params }: { params: Promise<{ memberId: string }> }
 ) {
   try {
-    const { memberId } = params;
+    const { memberId } = await params;
     const { organizationId } = await request.json();
     
     if (!memberId || !organizationId) {
@@ -17,8 +17,7 @@ export async function DELETE(
       );
     }
 
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = await createClient();
 
     // Verificar la sesión del usuario
     const { data: { user }, error: authError } = await supabase.auth.getUser();

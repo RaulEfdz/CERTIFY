@@ -2,7 +2,8 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { HexColorPicker } from "react-colorful";
-import { ColorWheel } from "lucide-react";
+import { Palette } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 interface ColorPickerProps {
   value: string;
@@ -32,7 +33,7 @@ export const ColorPicker = ({
             style={{ backgroundColor: value }}
           />
           <span>{value}</span>
-          <ColorWheel className="ml-auto h-4 w-4 opacity-50" />
+          <Palette className="ml-auto h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

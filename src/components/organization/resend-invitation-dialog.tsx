@@ -57,7 +57,7 @@ export function ResendInvitationDialog({
       {isLoading ? (
         <Icons.spinner className="h-4 w-4 animate-spin" />
       ) : (
-        <Icons.mail className="h-4 w-4" />
+        <Icons.logo className="h-4 w-4" />
       )}
       <span className="sr-only">Reenviar invitación</span>
     </Button>

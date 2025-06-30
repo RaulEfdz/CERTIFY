@@ -4,7 +4,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Code, Copy } from "lucide-react";
 
-export const JsonEditor = ({ jsonData, setJsonData, generating, detectedVariables, onGenerate, onFormat, onCopy }) => (
+interface JsonEditorProps {
+  jsonData: string;
+  setJsonData: (value: string) => void;
+  generating: boolean;
+  detectedVariables: string[];
+  onGenerate: () => void;
+  onFormat: () => void;
+  onCopy: () => void;
+}
+
+export const JsonEditor = ({
+  jsonData,
+  setJsonData,
+  generating,
+  detectedVariables,
+  onGenerate,
+  onFormat,
+  onCopy,
+}: JsonEditorProps) => (
     <div>
         <Label htmlFor="json-data" className="text-sm">Datos de Muestra (JSON)</Label>
         <div className="flex items-center gap-2 mt-2 mb-1 flex-wrap">

@@ -59,6 +59,7 @@ export const DEFAULT_TEMPLATE: TemplateConfig = {
   body1: 'Se otorga el presente certificado a',
   body2: 'por haber completado exitosamente el curso de',
   courseName: 'Nombre del Curso',
+  studentName: '',
   signatures: [{ imageUrl: '', dataAiHint: 'firma' }],
   overlayColor: 'rgba(255, 255, 255, 0.9)',
   certificateSize: 'landscape',
@@ -66,4 +67,5 @@ export const DEFAULT_TEMPLATE: TemplateConfig = {
   bodyColor: '#333333',
   customCss: '',
   customJs: '',
+  orientation: 'landscape',
 };

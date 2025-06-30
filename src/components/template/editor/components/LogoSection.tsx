@@ -72,7 +72,7 @@ export const LogoSection = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white"
                 onClick={() => {
                   setPreview(null);
                   onLogoChange('');

@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 
 export default async function OrganizationMembersPage() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   // Verificar sesión
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -18,19 +17,24 @@ export default async function OrganizationMembersPage() {
   }
 
   // Obtener la organización actual del usuario
+  interface MembershipRow {
+    organization_id: string;
+    organizations: { name: string }[];
+  }
+
   const { data: membership, error: membershipError } = await supabase
     .from('organization_members')
     .select('organization_id, organizations(name)')
     .eq('user_id', user.id)
-    .single();
+    .single<MembershipRow>();
 
   if (membershipError || !membership) {
     redirect('/settings/organization');
   }
 
   const organizationId = membership.organization_id;
-  const organizationName = typeof membership.organizations === 'object' ? 
-    (membership.organizations as { name: string }).name : '';
+  const organizationName = membership.organizations[0]?.name ?? '';
+
 
   // Obtener los miembros de la organización
   const { data: members, error: membersError } = await supabase
@@ -44,6 +48,12 @@ export default async function OrganizationMembersPage() {
     `)
     .eq('organization_id', organizationId)
     .order('created_at', { ascending: false });
+
+  // Adaptar members para que profiles sea un objeto y no un array
+  const membersFixed = (members || []).map((m: any) => ({
+    ...m,
+    profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles
+  }));
 
   // Obtener las invitaciones pendientes
   const { data: pendingInvitations, error: invitationsError } = await supabase
@@ -80,7 +90,7 @@ export default async function OrganizationMembersPage() {
 
       <div className="space-y-4">
         <MembersTable 
-          members={members || []} 
+          members={membersFixed} 
           pendingInvitations={pendingInvitations || []}
           currentUserId={user.id}
           organizationId={organizationId}

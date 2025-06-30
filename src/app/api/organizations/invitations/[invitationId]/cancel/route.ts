@@ -1,28 +1,28 @@
-import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { supabase } from "@/lib/supabase/client";
 
 export async function POST(
   request: Request,
-  { params }: { params: { invitationId: string } }
+  { params }: { params: Promise<{ invitationId: string; organizationId: string }> }
 ) {
   try {
-    const { invitationId } = params;
-    const { organizationId } = await request.json();
-    
+    const { invitationId, organizationId } = await params;
+
+    // Validación de parámetros
     if (!invitationId || !organizationId) {
       return NextResponse.json(
-        { error: 'Faltan campos requeridos' },
+        { error: 'Invitación inválida' },
         { status: 400 }
       );
     }
 
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
-
     // Verificar la sesión del usuario
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authError
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json(
         { error: 'No autorizado. Debes iniciar sesión primero.' },
@@ -30,7 +30,7 @@ export async function POST(
       );
     }
 
-    // Verificar que el usuario tiene permisos para cancelar invitaciones
+    // Verificar permisos en la organización
     const { data: membership, error: membershipError } = await supabase
       .from('organization_members')
       .select('role')
@@ -60,13 +60,13 @@ export async function POST(
       );
     }
 
-    // Actualizar la invitación como cancelada
+    // Cancelar la invitación
     const { error: updateError } = await supabase
       .from('organization_invitations')
-      .update({ 
+      .update({
         status: 'cancelled',
         cancelled_at: new Date().toISOString(),
-        cancelled_by: user.id 
+        cancelled_by: user.id
       })
       .eq('id', invitationId);
 

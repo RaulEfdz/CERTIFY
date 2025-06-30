@@ -1,10 +1,10 @@
-import { supabase } from './config';
-import { Database } from './types/database.types';
+import { supabase } from '@/lib/supabase/client';
+import { Database } from './config';
 
-type TableName = keyof Database['public']['Tables'];
+type TableName = Extract<keyof Database['public']['Tables'], string>;
 type TableRow<T extends TableName> = Database['public']['Tables'][T]['Row'];
 type TableInsert<T extends TableName> = Database['public']['Tables'][T]['Insert'];
-type TableUpdate<T extends TableName> = Database['public']['Tables'][T]['Update'];
+type TableUpdate<T extends TableName> = Database['public']['Tables'][T]['Update']; // Ya definidos correctamente según los tipos de Supabase
 
 export class DatabaseService {
   // Obtener todos los registros de una tabla
@@ -17,7 +17,10 @@ export class DatabaseService {
       .select(columns);
 
     if (error) throw error;
-    return data || [];
+    if (!Array.isArray(data)) {
+      throw new Error('Supabase returned an unexpected response (not an array).');
+    }
+    return data as unknown as TableRow<T>[];
   }
 
   // Obtener un registro por ID
@@ -32,8 +35,12 @@ export class DatabaseService {
       .eq('id', id)
       .single();
 
-    if (error) return null;
-    return data;
+    if (error) throw error;
+    if (data === null) return null;
+    if (typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Supabase returned an unexpected response (not an object).');
+    }
+    return data as TableRow<T>;
   }
 
   // Crear un nuevo registro

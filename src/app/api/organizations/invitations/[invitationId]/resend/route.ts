@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: { invitationId: string } }
+  { params }: { params: Promise<{ invitationId: string }> }
 ) {
   try {
-    const { invitationId } = params;
+    const { invitationId } = await params;
     
     if (!invitationId) {
       return NextResponse.json(
@@ -16,8 +16,7 @@ export async function POST(
       );
     }
 
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = await createClient();
 
     // Verificar la sesión del usuario
     const { data: { user }, error: authError } = await supabase.auth.getUser();

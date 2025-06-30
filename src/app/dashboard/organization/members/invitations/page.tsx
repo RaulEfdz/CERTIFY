@@ -1,11 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { InvitationsList } from "./list";
 
 export default async function OrganizationInvitationsPage() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
   
   // Verificar que el usuario esté autenticado
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -89,7 +87,10 @@ export default async function OrganizationInvitationsPage() {
         
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <InvitationsList 
-            invitations={invitations || []} 
+            invitations={(invitations || []).map(inv => ({
+              ...inv,
+              invited_by: Array.isArray(inv.invited_by) ? inv.invited_by[0] : inv.invited_by,
+            }))} 
             organizationId={profile.current_organization_id}
           />
         </div>

@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 // Server Action que crearemos en el siguiente paso
 import { inviteUserToOrganization } from "./actions";
 
-const roles: OrganizationRole[] = ["admin", "member", "guest"];
+const roles = ["admin", "member", "guest"] as const;
 
 const formSchema = z.object({
   email: z.string().email({ message: "Debe ser un email válido." }),

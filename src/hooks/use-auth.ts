@@ -1,13 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { useSession } from '@/components/auth/session-provider'
 
 export function useAuth() {
   const { session, user, loading } = useSession()
   const router = useRouter()
-  const supabase = createClient()
 
   const sendVerificationEmail = async (email: string) => {
     try {

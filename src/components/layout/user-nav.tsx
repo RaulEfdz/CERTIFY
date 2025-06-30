@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,6 @@ import { Icons } from "@/components/icons";
 
 export function UserNav() {
   const router = useRouter();
-  const supabase = createClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignOut = async () => {
@@ -57,7 +56,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Icons.user className="mr-2 h-4 w-4" />
+            <Icons.users className="mr-2 h-4 w-4" />
             <span>Perfil</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
@@ -72,7 +71,7 @@ export function UserNav() {
           {isLoading ? (
             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
           ) : (
-            <Icons.logOut className="mr-2 h-4 w-4" />
+            <Icons.logo className="mr-2 h-4 w-4" />
           )}
           <span>Cerrar sesión</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

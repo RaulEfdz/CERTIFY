@@ -12,10 +12,10 @@ export default function DashboardPage() {
         <div className="mx-auto flex h-24 w-24 items-center justify-center mb-6">
           <img src="/logo.png" alt="Certify Logo" className="h-full w-full object-contain" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
           Bienvenido a Certify
         </h1>
-        <p className="text-lg text-white mb-8">
+        <p className="text-lg text-muted-foreground mb-8">
           Tu plataforma para crear y gestionar certificados digitales de manera sencilla y profesional.
         </p>
         
@@ -27,7 +27,7 @@ export default function DashboardPage() {
                 <PlusCircle className="mr-2 h-5 w-5" /> Crear tu primera plantilla
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-white border-white/30 hover:bg-white/10 hover:text-white">
+            <Button asChild size="lg" variant="outline" className="text-foreground border-border hover:bg-muted/10 hover:text-foreground">
               <Link href="/templates">
                 <FileText className="mr-2 h-5 w-5" /> Ver documentación
               </Link>

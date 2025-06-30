@@ -12,7 +12,6 @@ export const TemplateHeader = () => (
                         Volver
                     </a>
                 </Button>
-                <h1 className="text-xl font-semibold">Editor de Plantilla</h1>
             </div>
             
             <div className="flex items-center space-x-2">
