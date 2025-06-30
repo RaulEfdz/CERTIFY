@@ -67,7 +67,7 @@ export function MainNav() {
         {!isCollapsed && (
           <Link href="/dashboard" className="flex items-center space-x-2">
             <img src="/logo.png" alt="Certify Logo" className="h-8 w-8" />
-            <span className="font-bold text-lg text-white">Certify</span>
+            <span className="font-bold text-lg text-foreground">Certify</span>
           </Link>
         )}
         {isCollapsed && (
@@ -79,7 +79,7 @@ export function MainNav() {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="h-8 w-8 text-white/70 hover:bg-white/10 hover:text-white"
+          className="h-8 w-8 text-foreground/70 hover:bg-muted/30 hover:text-foreground"
         >
           {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
           <span className="sr-only">{isCollapsed ? 'Expandir menú' : 'Contraer menú'}</span>
@@ -101,8 +101,8 @@ export function MainNav() {
               className={cn(
                 "group flex items-center px-3 py-3 text-sm font-medium rounded-lg mx-2 transition-colors duration-200",
                 pathname === item.href
-                  ? "bg-primary/20 text-white border-l-4 border-primary"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
+                  ? "bg-primary/20 text-foreground border-l-4 border-primary"
+                  : "text-foreground/70 hover:bg-muted/30 hover:text-foreground"
               )}
             >
               <div className="flex items-center">
@@ -151,7 +151,7 @@ export function MainNav() {
           variant="ghost"
           size="sm"
           onClick={toggleSidebar}
-          className="w-full justify-start text-white/70 hover:bg-white/10 hover:text-white"
+          className="w-full justify-start text-foreground/70 hover:bg-muted/30 hover:text-foreground"
         >
           {isCollapsed ? (
             <PanelLeftOpen className="h-5 w-5" />

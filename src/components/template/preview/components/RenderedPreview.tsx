@@ -24,7 +24,7 @@ export const RenderedPreview = ({ renderedHtml }: RenderedPreviewProps) => {
             </div>
             <div className="flex-1 overflow-auto p-8">
                 <div
-                    className="shadow-lg mx-auto bg-white"
+                    className="shadow-lg mx-auto bg-muted"
                     style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}
                     dangerouslySetInnerHTML={{ __html: renderedHtml }}
                 />

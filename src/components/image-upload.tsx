@@ -56,7 +56,7 @@ export function ImageUpload({
   if (value) {
     return (
       <div className="relative group">
-        <div className="relative w-[500px] h-[500px] rounded-md overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-50">
+        <div className="relative w-[500px] h-[500px] rounded-md overflow-hidden border border-border flex items-center justify-center bg-muted/30">
           <img
             src={value}
             alt="Vista previa del logo"

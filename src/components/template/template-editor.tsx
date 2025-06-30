@@ -14,22 +14,23 @@ export function ImprovedTemplateEditor() {
 
     return (
         <TooltipProvider>
-            <div className="flex flex-col h-screen bg-background">
-                <TemplateHeader />
-                <div className="flex flex-1 overflow-hidden">
-                    {/* Sidebar: oculta en pantallas chicas, visible en md+ */}
-                    <div className="hidden md:block h-full">
-                        <TemplateSidebar state={state} setters={state} />
-                    </div>
-                    {/* Preview: ocupa todo el ancho en móvil, comparte espacio en desktop */}
-                    <div className="flex-1 min-w-0 w-full h-full overflow-auto flex items-center justify-center">
+            <div className="flex h-screen bg-background">
+                {/* Sidebar lateral fijo, scrollable si es necesario */}
+                <aside className="hidden md:flex flex-shrink-0 w-64 bg-card border-r overflow-y-auto flex-col">
+                    <TemplateSidebar state={state} setters={state} />
+                </aside>
+                {/* Panel central de configuración y vista previa */}
+                <main className="flex flex-1 overflow-hidden">
+                    {/* Panel de configuración central, scrollable */}
+                    <section className="flex-1 p-0 md:p-6 overflow-y-auto flex flex-col">
+                        <TemplateHeader />
+                        {/* Aquí puedes poner más contenido de configuración central si lo necesitas */}
+                    </section>
+                    {/* Panel de vista previa a la derecha, siempre visible */}
+                    <div className="flex-1 p-0 md:p-6 flex items-center justify-center bg-muted/40 min-w-0 max-w-4xl">
                         <TemplatePreview templateHtml={templateHtml} certificateSize={state.certificateSize} />
                     </div>
-                </div>
-                {/* Sidebar móvil: abajo, sticky, visible solo en pantallas chicas */}
-                <div className="block md:hidden w-full max-h-[60vh] overflow-y-auto border-t bg-card sticky bottom-0 z-20">
-                    <TemplateSidebar state={state} setters={state} />
-                </div>
+                </main>
             </div>
         </TooltipProvider>
     );

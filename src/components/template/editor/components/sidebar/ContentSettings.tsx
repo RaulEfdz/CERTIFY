@@ -46,7 +46,7 @@ export const ContentSettings = ({ state, setters }: ContentSettingsProps) => (
                     <div className="space-y-4">
                         <FormField label="Título">
                             <Input 
-                            className="bg-white"
+                            className="bg-muted text-foreground"
                                 value={state.title} 
                                 onChange={(e) => setters.setTitle(e.target.value)}
                                 placeholder="Ej: Certificado de Participación"
@@ -55,7 +55,7 @@ export const ContentSettings = ({ state, setters }: ContentSettingsProps) => (
                         
                         <FormField label="Texto Principal">
                             <Textarea 
-                            className="bg-white"
+                            className="bg-muted text-foreground"
                                 value={state.body1} 
                                 onChange={(e) => setters.setBody1(e.target.value)}
                                 placeholder="Ej: Se otorga el presente certificado a:"
@@ -65,7 +65,7 @@ export const ContentSettings = ({ state, setters }: ContentSettingsProps) => (
                         
                         <FormField label="Texto Secundario">
                             <Textarea 
-                            className="bg-white"
+                            className="bg-muted text-foreground"
                                 value={state.body2} 
                                 onChange={(e) => setters.setBody2(e.target.value)}
                                 placeholder="Ej: Por haber completado exitosamente el curso de..."
@@ -75,7 +75,7 @@ export const ContentSettings = ({ state, setters }: ContentSettingsProps) => (
 
                         <FormField label="Nombre del Estudiante">
                             <Input 
-                            className="bg-white"
+                            className="bg-muted text-foreground"
                                 value={state.studentName} 
                                 onChange={(e) => setters.setStudentName(e.target.value)}
                                 placeholder="Ej: Ada Lovelace"
@@ -84,7 +84,7 @@ export const ContentSettings = ({ state, setters }: ContentSettingsProps) => (
                         
                         <FormField label="Nombre del Curso">
                             <Input 
-                            className="bg-white"
+                            className="bg-muted text-foreground"
                                 value={state.courseName} 
                                 onChange={(e) => setters.setCourseName(e.target.value)}
                                 placeholder="Ej: Introducción a la Programación"

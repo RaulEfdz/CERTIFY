@@ -140,7 +140,7 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
           type="button"
           variant="outline"
           onClick={() => inputRef.current?.click()}
-          className="w-full bg-white"
+          className="w-full bg-muted text-foreground hover:bg-accent"
         >
           <Upload className="mr-2 h-4 w-4" /> {label}
         </Button>

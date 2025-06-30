@@ -32,13 +32,13 @@ export default function Header() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-white/70" />
           <Input 
             placeholder="Buscar..." 
-            className="pl-8 w-[200px] lg:w-[300px] rounded-md bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30"
+            className="pl-8 w-[200px] lg:w-[300px] rounded-md bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring"
           />
         </div>
         <Button 
           variant="ghost" 
           size="icon" 
-          className="rounded-full text-white hover:bg-white/10 hover:text-white"
+          className="rounded-full text-foreground hover:bg-muted/30 hover:text-foreground"
         >
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notificaciones</span>

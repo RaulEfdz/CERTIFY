@@ -58,7 +58,7 @@ export const BackgroundSettings = ({ state, setters }: BackgroundSettingsProps) 
                             <ImageUpload 
                                 onUpload={setters.setBackgroundUrl}
                                 label="Subir imagen de fondo"
-                                className="w-full bg-white"
+                                className="w-full bg-muted text-foreground"
                             />
                             {state.backgroundUrl && (
                                 <div className="mt-2 text-xs text-muted-foreground flex items-center">
@@ -82,12 +82,12 @@ export const BackgroundSettings = ({ state, setters }: BackgroundSettingsProps) 
                                     type="color" 
                                     value={state.overlayColor} 
                                     onChange={(e) => setters.setOverlayColor(e.target.value)}
-                                    className="h-10 w-10 rounded border bg-white"
+                                    className="h-10 w-10 rounded border bg-muted text-foreground"
                                 />
                                 <Input 
                                     value={state.overlayColor} 
                                     onChange={(e) => setters.setOverlayColor(e.target.value)}
-                                    className="flex-1 bg-white"
+                                    className="flex-1 bg-muted text-foreground"
                                 />
                             </div>
                         </FormField>

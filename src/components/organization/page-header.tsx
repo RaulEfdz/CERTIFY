@@ -19,8 +19,8 @@ export function PageHeader({ title, description, actions }: PageHeaderProps) {
         <div className="space-y-2">
           {isLoading ? (
             <div className="space-y-2">
-              <Skeleton className="h-8 w-64 bg-white/10" />
-              <Skeleton className="h-4 w-48 bg-white/10" />
+              <Skeleton className="h-8 w-64 bg-muted/30" />
+              <Skeleton className="h-4 w-48 bg-muted/30" />
             </div>
           ) : (
             <>

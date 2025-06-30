@@ -224,7 +224,7 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
                             <div className="relative w-full h-full flex items-center justify-center min-w-0">
                                 <div
                                     className={cn(
-                                        'bg-white shadow-xl rounded-lg overflow-hidden border border-border/50',
+                                        'bg-muted shadow-xl rounded-lg overflow-hidden border border-border/50',
                                         'transition-transform duration-200',
                                         'flex items-center justify-center',
                                         'origin-center',
@@ -252,7 +252,7 @@ export const TemplatePreview = ({ templateHtml, certificateSize }: TemplatePrevi
                                         srcDoc={templateHtml}
                                         className={cn(
                                             'border-0',
-                                            'bg-white',
+                                            'bg-muted',
                                             'w-full h-full',
                                             'overflow-auto',
                                             'rounded-lg'

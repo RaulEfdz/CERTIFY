@@ -141,7 +141,7 @@ export function InviteMemberForm({
               variant="outline"
               onClick={onCancel}
               disabled={isLoading}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300 hover:border-gray-400"
+              className="bg-muted hover:bg-muted/50 text-foreground border-border hover:border-border/80"
             >
               Cancelar
             </Button>

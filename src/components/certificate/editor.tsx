@@ -194,7 +194,7 @@ export function CertificateEditor() {
       {/* Vista previa del certificado */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div 
-          className="relative w-full max-w-3xl aspect-[1.41/1] bg-white shadow-lg flex flex-col items-center justify-center p-12 text-center"
+          className="relative w-full max-w-3xl aspect-[1.41/1] bg-muted shadow-lg flex flex-col items-center justify-center p-12 text-center"
           style={{
             backgroundColor: template.styles.backgroundColor,
             border: `${template.styles.borderWidth}px solid ${template.styles.borderColor}`,
