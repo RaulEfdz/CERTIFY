@@ -29,7 +29,7 @@ export function ImprovedTemplateEditor() {
 
           {/* Contenido central: preview */}
           <div className="flex flex-1 overflow-hidden">
-            <div className="flex-1 p-0 md:p-6 flex items-center justify-center bg-muted/40 min-w-0 max-w-4xl mx-auto overflow-auto">
+            <div className="flex-1 p-0 md:p-6 flex items-center justify-center bg-muted/40 min-w-0 mx-auto overflow-auto">
               <TemplatePreview
                 templateHtml={templateHtml}
                 certificateSize={state.certificateSize}
