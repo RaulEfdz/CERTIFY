@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Settings2, X, Save } from "lucide-react";
+import { Settings2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { useTemplateState } from "./editor/hooks/useTemplateState";
@@ -48,11 +47,9 @@ export function DynamicTemplateEditor({
   initialTemplate, 
   onTemplateUpdate 
 }: DynamicTemplateEditorProps) {
-  const router = useRouter();
   const state = useTemplateState();
   const [template, setTemplate] = useState<Template>(initialTemplate);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [autoSaving, setAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date(initialTemplate.last_saved_at));
   
@@ -152,8 +149,6 @@ export function DynamicTemplateEditor({
 
     try {
       setAutoSaving(true);
-      const supabase = createClient();
-
       const data = await mockDatabase.autoSave(templateId, state as any, templateHtml);
 
       if (data.success) {
@@ -174,9 +169,10 @@ export function DynamicTemplateEditor({
       const config = autoSaveData.config;
       // Aplicar configuración restaurada
       Object.keys(config).forEach(key => {
-        const setter = state[`set${key.charAt(0).toUpperCase() + key.slice(1)}`];
+        const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}` as keyof typeof state;
+        const setter = state[setterName];
         if (typeof setter === 'function') {
-          setter(config[key]);
+          (setter as any)(config[key]);
         }
       });
       
@@ -188,9 +184,6 @@ export function DynamicTemplateEditor({
   // Guardar cambios permanentes
   const handleSaveTemplate = async (templateData: SaveTemplateData): Promise<boolean> => {
     try {
-      setSaving(true);
-      const supabase = createClient();
-
       const data = await mockDatabase.saveTemplate(
         templateId,
         state as any,
@@ -207,13 +200,13 @@ export function DynamicTemplateEditor({
           description: templateData.description,
           config: state as TemplateConfig,
           html: templateHtml,
-          version: data.version,
-          last_saved_at: data.saved_at
+          version: data.version || template.version,
+          last_saved_at: data.saved_at || template.last_saved_at
         };
 
         setTemplate(updatedTemplate);
         setHasUnsavedChanges(false);
-        setLastSaved(new Date(data.saved_at));
+        setLastSaved(new Date(data.saved_at || new Date().toISOString()));
         
         if (onTemplateUpdate) {
           onTemplateUpdate(updatedTemplate);
@@ -233,8 +226,6 @@ export function DynamicTemplateEditor({
       console.error('Error saving template:', error);
       toast.error("Failed to save template");
       return false;
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -259,7 +250,8 @@ export function DynamicTemplateEditor({
         event.preventDefault();
         if (hasUnsavedChanges) {
           // Abrir modal de guardado
-          document.querySelector('[data-save-trigger]')?.click();
+          const saveButton = document.querySelector('[data-save-trigger]') as HTMLElement;
+          saveButton?.click();
         }
       }
     };
@@ -270,7 +262,7 @@ export function DynamicTemplateEditor({
 
   return (
     <TooltipProvider>
-      <div className="flex h-[calc(100vh-4rem)] bg-background">
+      <div className="flex h-screen bg-background">
         
         {/* Overlay cuando el sidebar está abierto */}
         {showSidebar && (
@@ -313,7 +305,36 @@ export function DynamicTemplateEditor({
             
             {/* Contenido del sidebar */}
             <div className="flex-1 overflow-y-auto">
-              <TemplateSidebar state={state} setters={state} />
+              <TemplateSidebar 
+                state={{
+                  certificateSize: state.certificateSize,
+                  logoUrl: state.logoUrl,
+                  logoWidth: state.logoWidth,
+                  logoHeight: state.logoHeight,
+                  title: state.title,
+                  body1: state.body1,
+                  body2: state.body2,
+                  courseName: state.courseName,
+                  studentName: state.studentName,
+                  orientation: state.orientation,
+                  backgroundUrl: state.backgroundUrl,
+                  overlayColor: state.overlayColor,
+                }}
+                setters={{
+                  setCertificateSize: state.setCertificateSize,
+                  setLogoUrl: (url: string | null) => state.setLogoUrl(url || ''),
+                  setLogoWidth: state.setLogoWidth,
+                  setLogoHeight: state.setLogoHeight,
+                  setTitle: state.setTitle,
+                  setBody1: state.setBody1,
+                  setBody2: state.setBody2,
+                  setCourseName: state.setCourseName,
+                  setStudentName: state.setStudentName,
+                  setOrientation: state.setOrientation,
+                  setBackgroundUrl: (url: string | null) => state.setBackgroundUrl(url || ''),
+                  setOverlayColor: state.setOverlayColor,
+                }}
+              />
             </div>
             
             {/* Footer del drawer */}
@@ -352,7 +373,7 @@ export function DynamicTemplateEditor({
               onToggleSidebar={() => setShowSidebar(!showSidebar)}
               previewControls={previewControls}
               activeTab={activeTab}
-              onTabChange={setActiveTab}
+              onTabChange={(tab: string) => setActiveTab(tab)}
               templateName={template.name}
               hasUnsavedChanges={hasUnsavedChanges}
               lastSaved={lastSaved}
@@ -366,7 +387,6 @@ export function DynamicTemplateEditor({
                 templateHtml={templateHtml}
                 certificateSize={state.certificateSize}
                 hideControls={true}
-                onControlsChange={setPreviewControls}
               />
             )}
             {activeTab === "code" && (

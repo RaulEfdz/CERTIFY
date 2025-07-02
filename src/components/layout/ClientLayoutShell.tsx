@@ -15,6 +15,7 @@ import { DatabaseConnectionStatus } from '@/components/database/connection-statu
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isPublicRoute = ['/login', '/register', '/auth/callback'].includes(pathname);
+  const isTemplateEditorRoute = pathname.startsWith('/templates/edit/') || pathname === '/templates/new';
 
   return (
     <SessionProvider>
@@ -23,6 +24,13 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
           {isPublicRoute ? (
             <main className="min-h-screen bg-background">
               {children}
+            </main>
+          ) : isTemplateEditorRoute ? (
+            // Template editor gets full screen without sidebar/header
+            <main className="min-h-screen bg-background">
+              <AuthCheck>
+                {children}
+              </AuthCheck>
             </main>
           ) : (
             <SidebarProvider>

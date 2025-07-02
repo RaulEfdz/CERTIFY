@@ -20,6 +20,8 @@ interface Template {
   description: string;
   category: string;
   tags: string[];
+  config: any;
+  html: string;
   status: string;
   is_public: boolean;
   thumbnail_url?: string;
@@ -95,7 +97,9 @@ export default function TemplatesPage() {
 
       if (error) throw error;
 
-      setTemplates(prev => [data, ...prev]);
+      if (data) {
+        setTemplates(prev => [data, ...prev]);
+      }
       toast.success("Template duplicated successfully");
     } catch (error) {
       console.error('Error duplicating template:', error);

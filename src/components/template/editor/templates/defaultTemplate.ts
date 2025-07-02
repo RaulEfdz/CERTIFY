@@ -73,165 +73,340 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${safeTitle}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --color-text-primary: #1f2937;
-      --color-text-secondary: #4b5563;
-      --color-bg: #ffffff;
-      --content-bg: ${overlayColor};
-      --spacing: 1rem;
-      --radius: 8px;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --primary-color: #1e40af;
+      --secondary-color: #3b82f6;
+      --accent-color: #fbbf24;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --bg-primary: #ffffff;
+      --bg-overlay: ${overlayColor};
+      --border-color: #e5e7eb;
+      --border-accent: #dbeafe;
     }
     
     *, *::before, *::after { 
       box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
     }
     
     body, html {
-      margin: 0;
-      padding: 0;
       width: 100%;
       height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--color-text-primary);
-      background: var(--color-bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      line-height: 1.6;
+    }
+    
+    .certificate-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
+      ${backgroundUrl ? `background: url('${backgroundUrl}') center/cover no-repeat;` : 'background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);'}
+    }
+    
+    .background-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-overlay);
+      z-index: 1;
     }
     
     .certificate {
       position: relative;
+      z-index: 2;
       width: 100%;
-      min-height: 100vh;
+      height: 100%;
+      background: var(--bg-primary);
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: calc(var(--spacing) * 2);
-      ${backgroundUrl ? `background: url('${backgroundUrl}') center/cover no-repeat;` : ''}
+      flex-direction: column;
     }
     
-    .overlay {
+    /* Decorative border */
+    .certificate::before {
+      content: '';
       position: absolute;
-      inset: 0;
-      background: var(--overlay-color);
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      pointer-events: none;
       z-index: 1;
     }
     
-    .content {
+    /* Corner decorations */
+    .certificate::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      background: 
+        radial-gradient(circle at 0 0, var(--secondary-color) 20%, transparent 20%),
+        radial-gradient(circle at 100% 0, var(--accent-color) 20%, transparent 20%),
+        radial-gradient(circle at 0 100%, var(--accent-color) 20%, transparent 20%),
+        radial-gradient(circle at 100% 100%, var(--secondary-color) 20%, transparent 20%);
+      background-size: 30px 30px;
+      background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+      opacity: 0.08;
+      z-index: 1;
+    }
+    
+    .certificate-content {
       position: relative;
       z-index: 2;
-      max-width: 900px;
-      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 40px 60px;
       text-align: center;
-      background: var(--content-bg);
-      padding: calc(var(--spacing) * 3);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
+      flex: 1;
+    }
+    
+    /* Header Section */
+    .certificate-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    
+    .logo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
     
     .logo {
-      max-width: ${validLogoWidth}px;
-      max-height: ${validLogoHeight}px;
+      max-width: ${Math.min(validLogoWidth, 120)}px;
+      max-height: ${Math.min(validLogoHeight, 80)}px;
       height: auto;
       width: auto;
-      margin-bottom: calc(var(--spacing) * 1.5);
       object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
     
     .logo-placeholder {
-      width: ${validLogoWidth}px;
-      height: ${validLogoHeight}px;
-      margin: 0 auto calc(var(--spacing) * 1.5);
+      width: ${Math.min(validLogoWidth, 120)}px;
+      height: ${Math.min(validLogoHeight, 80)}px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #e5e7eb;
-      border-radius: var(--radius);
-      border: 2px dashed #9ca3af;
-    }
-    
-    .logo-placeholder-text {
-      color: var(--color-text-secondary);
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-    
-    h1 {
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      font-weight: 700;
-      margin-bottom: calc(var(--spacing) * 2);
-      color: var(--color-text-primary);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-    
-    .body-text {
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      line-height: 1.75;
-      margin-bottom: calc(var(--spacing) * 1.5);
-      color: var(--color-text-secondary);
-    }
-    
-    .student-name {
-      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+      color: white;
       font-weight: 600;
-      color: var(--color-text-primary);
-      margin: calc(var(--spacing) * 2) 0;
-      text-transform: uppercase;
+      font-size: 16px;
       letter-spacing: 0.5px;
     }
     
-    .course-label { 
-      font-weight: 600;
-      color: var(--color-text-primary);
+    .institution-name {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
     
-    .signatures {
+    .certificate-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      color: var(--primary-color);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      text-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+    }
+    
+    /* Body Section */
+    .certificate-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+      flex: 1;
+    }
+    
+    .presentation-text {
+      font-size: 18px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+    
+    .student-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 600;
+      color: var(--primary-color);
+      border-bottom: 3px solid var(--border-accent);
+      padding-bottom: 12px;
+      margin: 0 auto;
+      min-width: 350px;
+      max-width: 500px;
+      letter-spacing: 0.5px;
+      text-transform: capitalize;
+    }
+    
+    .completion-text {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.6;
+    }
+    
+    .course-info {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      padding: 20px 30px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      margin: 20px 0;
+    }
+    
+    .course-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    
+    .course-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-style: italic;
+    }
+    
+    /* Footer Section */
+    .certificate-footer {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-top: calc(var(--spacing) * 4);
-      padding-top: calc(var(--spacing) * 2);
-      border-top: 2px solid #e5e7eb;
-      gap: calc(var(--spacing) * 2);
+      align-items: end;
+      gap: 40px;
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 2px solid var(--border-color);
     }
     
-    .signature {
+    .signature-section {
       flex: 1;
-      max-width: 250px;
+      max-width: 200px;
     }
     
     .signature-line {
       width: 100%;
       height: 2px;
-      background: #374151;
-      margin-bottom: calc(var(--spacing) * 0.5);
+      background: linear-gradient(90deg, transparent, var(--text-secondary), transparent);
+      margin-bottom: 12px;
     }
     
-    .signature p {
-      margin: 0;
-      font-size: 0.875rem;
+    .signature-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .signature-title {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    
+    .date-section {
+      flex: 1;
+      max-width: 200px;
+      text-align: right;
+    }
+    
+    .date-label {
+      font-size: 14px;
+      color: var(--text-muted);
       font-weight: 500;
-      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .date-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
     }
     
     /* Responsive design */
     @media (max-width: 768px) {
-      .certificate {
-        padding: var(--spacing);
+      .certificate-container {
+        padding: 0;
       }
       
-      .content {
-        padding: calc(var(--spacing) * 2);
+      .certificate-content {
+        padding: 30px 25px;
+        grid-template-rows: auto 1fr auto;
       }
       
-      .signatures {
+      .certificate-header {
+        margin-bottom: 25px;
+        gap: 12px;
+      }
+      
+      .certificate-title {
+        font-size: clamp(24px, 6vw, 32px);
+      }
+      
+      .student-name {
+        font-size: clamp(20px, 5vw, 28px);
+        min-width: 250px;
+      }
+      
+      .certificate-footer {
         flex-direction: column;
-        gap: calc(var(--spacing) * 1.5);
+        text-align: center;
+        gap: 20px;
+        margin-top: 25px;
+        padding-top: 20px;
+      }
+      
+      .date-section {
         text-align: center;
       }
       
-      .signature {
-        max-width: 100%;
+      .course-info {
+        padding: 16px 20px;
+        margin: 15px 0;
+      }
+      
+      .certificate::before {
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+      }
+      
+      .certificate::after {
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
       }
     }
     
@@ -241,19 +416,35 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
         background: white !important;
       }
       
-      .certificate {
-        min-height: 100vh;
-        background: none !important;
+      .certificate-container {
+        background: white !important;
+        padding: 0;
+        height: 100vh;
+        min-height: auto;
       }
       
-      .overlay {
+      .background-overlay {
         display: none;
       }
       
-      .content {
-        background: white !important;
+      .certificate {
         box-shadow: none !important;
-        backdrop-filter: none !important;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+        height: 100%;
+      }
+      
+      .certificate::before {
+        border-color: var(--primary-color);
+        opacity: 1;
+      }
+      
+      .certificate::after {
+        opacity: 0.15;
+      }
+      
+      .certificate-content {
+        padding: 40px 60px;
       }
     }
     
@@ -261,38 +452,56 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
   </style>
 </head>
 <body>
-  <div class="certificate" role="main" aria-label="Certificado">
-    ${backgroundUrl ? '<div class="overlay" aria-hidden="true"></div>' : ''}
-    <div class="content" role="document">
-      ${
-        logoUrl
-          ? `<img src="${logoUrl}" alt="Logo de la institución" class="logo" loading="lazy" />`
-          : `<div class="logo-placeholder" aria-label="Espacio reservado para logo">
-               <span class="logo-placeholder-text">Logo</span>
-             </div>`
-      }
-      
-      <h1>${safeTitle}</h1>
-      
-      ${safeBody1 ? `<p class="body-text">${safeBody1}</p>` : ''}
-      
-      <div class="student-name">${safeStudentName}</div>
-      
-      ${safeBody2 ? `<p class="body-text">${safeBody2}</p>` : ''}
-      
-      <p class="body-text">
-        <span class="course-label">Curso:</span> ${safeCourseName}
-      </p>
-      
-      <div class="signatures" role="contentinfo">
-        <div class="signature">
-          <div class="signature-line" aria-hidden="true"></div>
-          <p>${safeDirectorName}</p>
-        </div>
-        <div class="signature">
-          <div class="signature-line" aria-hidden="true"></div>
-          <p>Fecha: ${formattedDate}</p>
-        </div>
+  <div class="certificate-container" role="main" aria-label="Certificado">
+    ${backgroundUrl ? '<div class="background-overlay" aria-hidden="true"></div>' : ''}
+    
+    <div class="certificate" role="document">
+      <div class="certificate-content">
+        <!-- Header Section -->
+        <header class="certificate-header">
+          <div class="logo-section">
+            ${
+              logoUrl
+                ? `<img src="${logoUrl}" alt="Logo de la institución" class="logo" loading="lazy" />`
+                : `<div class="logo-placeholder" aria-label="Logo de la institución">
+                     <span>LOGO</span>
+                   </div>`
+            }
+            <div class="institution-name">Logo de la institución</div>
+          </div>
+          
+          <h1 class="certificate-title">${safeTitle}</h1>
+        </header>
+        
+        <!-- Body Section -->
+        <main class="certificate-body">
+          ${safeBody1 ? `<p class="presentation-text">${safeBody1}</p>` : '<p class="presentation-text">Este certificado se presenta con orgullo a</p>'}
+          
+          <div class="student-name">${safeStudentName}</div>
+          
+          ${safeBody2 ? `<p class="completion-text">${safeBody2}</p>` : '<p class="completion-text">por haber completado exitosamente el curso</p>'}
+          
+          ${safeCourseName ? `
+            <div class="course-info">
+              <div class="course-label">Curso</div>
+              <div class="course-name">${safeCourseName}</div>
+            </div>
+          ` : ''}
+        </main>
+        
+        <!-- Footer Section -->
+        <footer class="certificate-footer" role="contentinfo">
+          <div class="signature-section">
+            <div class="signature-line" aria-hidden="true"></div>
+            <div class="signature-name">${safeDirectorName}</div>
+            <div class="signature-title">Director Académico</div>
+          </div>
+          
+          <div class="date-section">
+            <div class="date-label">Fecha de emisión</div>
+            <div class="date-value">${formattedDate}</div>
+          </div>
+        </footer>
       </div>
     </div>
   </div>

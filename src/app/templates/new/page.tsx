@@ -63,7 +63,7 @@ export default function NewTemplatePage() {
         is_public: false
       });
 
-      if (error) {
+      if (error || !data) {
         console.error('Error creating template:', error);
         toast.error("Error al crear la plantilla");
         router.push('/templates');

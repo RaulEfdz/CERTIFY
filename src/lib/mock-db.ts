@@ -262,7 +262,7 @@ export const mockDatabase = {
   },
 
   // Simulate template listing
-  async getTemplates(): Promise<{ data: MockTemplate[]; error: null }> {
+  async getTemplates(): Promise<{ data: MockTemplate[]; error: null | unknown }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 400));
       return { data: [...mockTemplates], error: null };

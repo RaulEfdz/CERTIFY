@@ -60,8 +60,8 @@ export function TemplateInitializer({
       const updatedConfig = {
         ...templateBase.config,
         // Preservar algunos campos existentes
-        studentName: initialTemplate.config?.studentName || templateBase.config.defaultStudentName || 'Nombre del Estudiante',
-        courseName: initialTemplate.config?.courseName || templateBase.config.defaultCourseName || 'Desarrollo Web Avanzado',
+        studentName: initialTemplate.config?.studentName || 'Nombre del Estudiante',
+        courseName: initialTemplate.config?.courseName || 'Desarrollo Web Avanzado',
         directorName: initialTemplate.config?.directorName || 'Firma del Director',
         date: initialTemplate.config?.date || new Date().toISOString(),
         dateLocale: initialTemplate.config?.dateLocale || 'es-ES'

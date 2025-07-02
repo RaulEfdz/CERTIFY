@@ -79,8 +79,8 @@ export function ConfigurationModal({ state, setters, templateHtml, children }: C
                         <div>
                           <label className="text-sm font-medium mb-2 block">Tamaño</label>
                           <SizeToggle 
-                            size={state.certificateSize} 
-                            onSizeChange={setters.setCertificateSize} 
+                            value={state.certificateSize} 
+                            onChange={setters.setCertificateSize} 
                           />
                         </div>
                         
