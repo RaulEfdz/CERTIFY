@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Save, Loader2, Check, AlertCircle, Tag, FileText, FolderOpen } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CertificatePreview } from "./CertificatePreview";
 
 interface SaveTemplateModalProps {
   children: React.ReactNode;
@@ -19,6 +20,8 @@ interface SaveTemplateModalProps {
   onSave?: (templateData: SaveTemplateData) => Promise<boolean>;
   initialName?: string;
   initialDescription?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export interface SaveTemplateData {
@@ -47,11 +50,26 @@ const suggestedTags = [
   "competencia", "premio", "reconocimiento", "participación"
 ];
 
-export function SaveTemplateModal({ children, templateConfig, templateHtml, onSave, initialName, initialDescription }: SaveTemplateModalProps) {
-  const [open, setOpen] = useState(false);
+export function SaveTemplateModal({ 
+  children, 
+  templateConfig, 
+  templateHtml, 
+  onSave, 
+  initialName, 
+  initialDescription,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange
+}: SaveTemplateModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  // Use external control if provided, otherwise use internal state
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = externalOnOpenChange || setInternalOpen;
+  
   const [loading, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   
   const [formData, setFormData] = useState({
     name: initialName || "",
@@ -60,6 +78,21 @@ export function SaveTemplateModal({ children, templateConfig, templateHtml, onSa
     tags: [] as string[],
     isPublic: false
   });
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: initialName || "",
+        description: initialDescription || "",
+        category: "",
+        tags: [] as string[],
+        isPublic: false
+      });
+      setError(null);
+      setSaved(false);
+    }
+  }, [open, initialName, initialDescription]);
 
   const [newTag, setNewTag] = useState("");
 
@@ -102,6 +135,7 @@ export function SaveTemplateModal({ children, templateConfig, templateHtml, onSa
             tags: [],
             isPublic: false
           });
+          setError(null);
         }, 2000);
       } else {
         setError("Error al guardar la plantilla. Inténtalo de nuevo.");
@@ -138,7 +172,10 @@ export function SaveTemplateModal({ children, templateConfig, templateHtml, onSa
   if (saved) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
+        {/* Only render trigger if not externally controlled */}
+        {externalOpen === undefined && (
+          <DialogTrigger asChild>{children}</DialogTrigger>
+        )}
         <DialogContent className="sm:max-w-md bg-background">
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <div className="rounded-full bg-green-100 p-3 mb-4">
@@ -156,11 +193,14 @@ export function SaveTemplateModal({ children, templateConfig, templateHtml, onSa
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      {/* Only render trigger if not externally controlled */}
+      {externalOpen === undefined && (
+        <DialogTrigger asChild>
+          {children}
+        </DialogTrigger>
+      )}
       
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto bg-background">
+      <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto bg-background">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Save className="h-5 w-5" />
@@ -168,13 +208,15 @@ export function SaveTemplateModal({ children, templateConfig, templateHtml, onSa
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Form */}
+          <div className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
           {/* Basic Info */}
           <Card>
@@ -302,24 +344,39 @@ export function SaveTemplateModal({ children, templateConfig, templateHtml, onSa
             </CardContent>
           </Card>
 
-          {/* Preview Info */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <h4 className="font-medium">Información de la plantilla:</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
-                  <div>
-                    <p><strong>Formato:</strong> {templateConfig?.certificateSize === "landscape" ? "Horizontal" : "Cuadrado"}</p>
+          </div>
+
+          {/* Right Column - Preview */}
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <h4 className="font-medium mb-4">Vista Previa del Certificado</h4>
+                <div className="h-96 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                  <CertificatePreview
+                    templateHtml={templateHtml}
+                    certificateSize={templateConfig?.certificateSize || 'landscape'}
+                    showControls={false}
+                    initialZoom={templateConfig?.certificateSize === 'square' ? 0.35 : 0.4}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Template Info */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Información de la plantilla:</h4>
+                  <div className="grid grid-cols-1 gap-2 text-sm text-muted-foreground">
+                    <p><strong>Formato:</strong> {templateConfig?.certificateSize === "landscape" ? "Horizontal (1000×707px)" : "Cuadrado (800×800px)"}</p>
                     <p><strong>Logo:</strong> {templateConfig?.logoUrl ? "Incluido" : "Sin logo"}</p>
-                  </div>
-                  <div>
                     <p><strong>Fondo:</strong> {templateConfig?.backgroundUrl ? "Imagen personalizada" : "Color sólido"}</p>
-                    <p><strong>Tamaño:</strong> ~{Math.round(templateHtml.length / 1024)}KB</p>
+                    <p><strong>Tamaño HTML:</strong> ~{Math.round(templateHtml.length / 1024)}KB</p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Actions */}

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Settings2, 
   X, 
-  AlertTriangle, 
   Save, 
   ZoomIn, 
   ZoomOut, 
@@ -19,10 +18,7 @@ import {
   Palette,
   Type,
   Image,
-  Undo2,
-  Redo2,
-  Download,
-  Share2
+  Download
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,10 +45,10 @@ import { useTemplateState } from "../hooks/useTemplateState";
 import { TemplateHeader } from "./TemplateHeader";
 import { TemplateSidebar } from "./TemplateSidebar";
 import { ConfigurationModal } from "./ConfigurationModal";
-import { SaveTemplateModal, SaveTemplateData } from "./SaveTemplateModal";
 import { getTemplateHtml } from "../templates/defaultTemplate";
 import { TemplateConfig } from "../types";
 import { mockDatabase } from "@/lib/mock-db";
+import { SaveTemplateData } from "./SaveTemplateModal";
 
 // Tipos mejorados con validación
 interface Template {
@@ -270,7 +266,7 @@ const TemplatePreview = ({
     <div className="h-full flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 relative">
       <div className="flex-1 overflow-auto p-2">
         {currentTab === "preview" ? (
-          <div className="flex items-center justify-center min-h-full relative">
+          <div className="flex items-center justify-center min-h-full relative overflow-auto">
             {/* Controles de zoom flotantes */}
             {onZoomChange && (
               <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-lg border border-slate-200 dark:border-slate-700 p-2 shadow-lg">
@@ -308,11 +304,13 @@ const TemplatePreview = ({
             )}
             
             <div 
-              className="bg-white shadow-2xl border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden transition-transform duration-200"
+              className="certificate-container bg-white shadow-2xl border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden transition-transform duration-200 my-4"
               style={{ 
                 transform: `scale(${zoom})`,
-                width: certificateSize?.width || '800px',
-                height: certificateSize?.height || '600px'
+                width: certificateSize === 'square' ? '800px' : '1000px',
+                height: certificateSize === 'square' ? '800px' : '707px',
+                minWidth: certificateSize === 'square' ? '300px' : '400px',
+                minHeight: certificateSize === 'square' ? '300px' : '283px'
               }}
               dangerouslySetInnerHTML={{ __html: templateHtml }}
             />
@@ -350,7 +348,6 @@ export function DynamicTemplateEditor({
   // Estados de UI
   const [showSidebar, setShowSidebar] = useState(false);
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
-  const [showSaveModal, setShowSaveModal] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [activeSidebarTab, setActiveSidebarTab] = useState("design");
 
@@ -449,7 +446,6 @@ export function DynamicTemplateEditor({
         markAsSaved();
         
         toast.success("Plantilla guardada exitosamente!");
-        setShowSaveModal(false);
         return true;
       }
 
@@ -461,11 +457,7 @@ export function DynamicTemplateEditor({
     }
   }, [templateId, state, templateHtml, template, updateTemplate, markAsSaved]);
 
-  const handleOpenSaveModal = useCallback(() => {
-    setShowSaveModal(true);
-  }, []);
-
-  useKeyboardShortcuts(showSidebar, setShowSidebar, hasUnsavedChanges, handleOpenSaveModal);
+  useKeyboardShortcuts(showSidebar, setShowSidebar, hasUnsavedChanges, () => {});
 
   // Sidebar tabs
   const sidebarTabs = [
@@ -563,6 +555,8 @@ export function DynamicTemplateEditor({
                   orientation: state.orientation,
                   backgroundUrl: state.backgroundUrl,
                   overlayColor: state.overlayColor,
+                  titleColor: state.titleColor,
+                  bodyColor: state.bodyColor,
                 }}
                 setters={{
                   setCertificateSize: state.setCertificateSize,
@@ -577,6 +571,8 @@ export function DynamicTemplateEditor({
                   setOrientation: state.setOrientation,
                   setBackgroundUrl: (url: string | null) => state.setBackgroundUrl(url || ''),
                   setOverlayColor: state.setOverlayColor,
+                  setTitleColor: state.setTitleColor,
+                  setBodyColor: state.setBodyColor,
                 }}
               />
             </div>
@@ -593,7 +589,7 @@ export function DynamicTemplateEditor({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 px-3"
+                  className="h-8 px-3 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
                   asChild
                 >
                   <a href="/templates">← Volver</a>
@@ -622,35 +618,13 @@ export function DynamicTemplateEditor({
 
               {/* Barra central de acciones - Todo en una línea */}
               <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-700">
-                {/* Guardar */}
-                <Button 
-                  onClick={handleOpenSaveModal}
-                  disabled={!hasUnsavedChanges}
-                  variant={hasUnsavedChanges ? "default" : "ghost"}
-                  size="sm"
-                  className="h-8 px-3 text-xs gap-1.5"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  Guardar
-                </Button>
-                
-                <div className="h-4 w-px bg-slate-300 dark:bg-slate-600" />
-                
-                {/* Exportar */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-8 px-3 text-xs gap-1.5"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Exportar
-                </Button>
+                {/* Guardar button removed - now handled by TemplateHeader */}
                 
                 {/* IA */}
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="h-8 px-3 text-xs gap-1.5"
+                  className="h-8 px-3 text-xs gap-1.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
                 >
                   <div className="h-3.5 w-3.5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-sm" />
                   IA
@@ -661,7 +635,7 @@ export function DynamicTemplateEditor({
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowSidebar(!showSidebar)}
-                  className="h-8 px-3 text-xs gap-1.5"
+                  className="h-8 px-3 text-xs gap-1.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
                 >
                   <Settings2 className="h-3.5 w-3.5" />
                   Configurar
@@ -674,7 +648,11 @@ export function DynamicTemplateEditor({
                   variant={activeTab === "preview" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("preview")}
-                  className="h-8 px-3 text-xs gap-1.5"
+                  className={`h-8 px-3 text-xs gap-1.5 ${
+                    activeTab === "preview" 
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+                  }`}
                 >
                   <Eye className="h-3.5 w-3.5" />
                   Vista Previa
@@ -684,15 +662,21 @@ export function DynamicTemplateEditor({
                   variant={activeTab === "code" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("code")}
-                  className="h-8 px-3 text-xs gap-1.5"
+                  className={`h-8 px-3 text-xs gap-1.5 ${
+                    activeTab === "code" 
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+                  }`}
                 >
                   <Code2 className="h-3.5 w-3.5" />
                   Código HTML
                 </Button>
               </div>
               
-              {/* Espacio equilibrante */}
-              <div className="flex-1" />
+              {/* Acciones del lado derecho */}
+              <div className="flex items-center gap-2">
+                {/* Espacio reservado para futuras acciones */}
+              </div>
             </div>
           </header>
 
@@ -709,18 +693,7 @@ export function DynamicTemplateEditor({
           </div>
         </main>
 
-        {/* Modal de guardado */}
-        {showSaveModal && (
-          <SaveTemplateModal
-            templateConfig={state}
-            templateHtml={templateHtml}
-            onSave={handleSaveTemplate}
-            initialName={template.name}
-            initialDescription={template.description}
-          >
-            <></>
-          </SaveTemplateModal>
-        )}
+        {/* Save modal is now handled by TemplateHeader */}
       </div>
     </TooltipProvider>
   );

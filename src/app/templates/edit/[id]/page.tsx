@@ -18,7 +18,7 @@ interface Template {
   tags: string[];
   config: TemplateConfig;
   html: string;
-  status: string;
+  status: 'draft' | 'published' | 'archived';
   is_public: boolean;
   created_by: string;
   organization_id: string | null;
@@ -86,7 +86,10 @@ export default function EditTemplatePage() {
       //   return;
       // }
 
-      setTemplate(data);
+      setTemplate({
+        ...data,
+        status: data.status as 'draft' | 'published' | 'archived'
+      });
     } catch (err) {
       console.error('Error loading template:', err);
       setError('An unexpected error occurred');

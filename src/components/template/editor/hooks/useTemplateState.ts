@@ -4,7 +4,7 @@ import { CertificateSize, SignatureData, INITIAL_CONFIG, TemplateConfig } from '
 
 export const useTemplateState = (initialState = INITIAL_CONFIG) => {
     const [certificateSize, setCertificateSize] = useState<CertificateSize>(initialState.certificateSize);
-    const [logoUrl, setLogoUrl] = useState<string>(initialState.logoUrl);
+    const [logoUrl, setLogoUrl] = useState<string | null>(initialState.logoUrl);
     const [logoWidth, setLogoWidth] = useState<number>(initialState.logoWidth);
     const [logoHeight, setLogoHeight] = useState<number>(initialState.logoHeight);
     const [backgroundUrl, setBackgroundUrl] = useState<string | null>(initialState.backgroundUrl);

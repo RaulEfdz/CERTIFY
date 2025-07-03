@@ -9,7 +9,7 @@ export interface TemplateConfig {
     orientation: string;
     date?: string;
     dateLocale?: string;
-    logoUrl: string;
+    logoUrl: string | null;
     logoWidth: number;
     logoHeight: number;
     backgroundUrl: string | null;
@@ -39,7 +39,7 @@ export const DEFAULT_SIGNATURE: SignatureData = {
 };
 
 export const INITIAL_CONFIG: TemplateConfig = {
-    logoUrl: 'https://placehold.co/80x80.png',
+    logoUrl: null,
     logoWidth: 80,
     logoHeight: 80,
     backgroundUrl: null,

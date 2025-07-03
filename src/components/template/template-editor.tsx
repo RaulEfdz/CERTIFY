@@ -24,7 +24,7 @@ export function ImprovedTemplateEditor() {
   const [showBaseSelector, setShowBaseSelector] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
-  const [activeTab, setActiveTab] = useState("preview");
+  // Removed activeTab - only preview mode now
   const [previewControls, setPreviewControls] = useState<PreviewControls | null>(null);
 
   const handleTemplateSelect = (template: TemplateBase) => {
@@ -139,6 +139,8 @@ export function ImprovedTemplateEditor() {
                   orientation: state.orientation,
                   backgroundUrl: state.backgroundUrl,
                   overlayColor: state.overlayColor,
+                  titleColor: state.titleColor,
+                  bodyColor: state.bodyColor,
                 }}
                 setters={{
                   setCertificateSize: state.setCertificateSize,
@@ -153,6 +155,8 @@ export function ImprovedTemplateEditor() {
                   setOrientation: state.setOrientation,
                   setBackgroundUrl: (url: string | null) => state.setBackgroundUrl(url || ''),
                   setOverlayColor: state.setOverlayColor,
+                  setTitleColor: state.setTitleColor,
+                  setBodyColor: state.setBodyColor,
                 }}
               />
             </div>
@@ -192,28 +196,16 @@ export function ImprovedTemplateEditor() {
               showSidebar={showSidebar}
               onToggleSidebar={() => setShowSidebar(!showSidebar)}
               previewControls={previewControls}
-              activeTab={activeTab}
-              onTabChange={(tab: string) => setActiveTab(tab)}
+              certificateSize={state.certificateSize}
             />
           </div>
 
           <div className="flex-1 overflow-hidden">
-            {activeTab === "preview" && (
-              <TemplatePreview
-                templateHtml={templateHtml}
-                certificateSize={state.certificateSize}
-                hideControls={true}
-              />
-            )}
-            {activeTab === "code" && (
-              <div className="h-full overflow-auto bg-background p-4">
-                <pre className="bg-muted p-4 rounded-md overflow-auto h-full">
-                  <code className="text-sm">
-                    {templateHtml}
-                  </code>
-                </pre>
-              </div>
-            )}
+            <TemplatePreview
+              templateHtml={templateHtml}
+              certificateSize={state.certificateSize}
+              hideControls={true}
+            />
           </div>
         </main>
       </div>

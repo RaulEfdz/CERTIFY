@@ -1,4 +1,4 @@
-import { TemplateConfig } from '../types';
+import { TemplateConfig, CERTIFICATE_DIMENSIONS } from '../types';
 
 /**
  * Generates HTML for a certificate template with customizable styling and content
@@ -10,6 +10,8 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     title,
     backgroundUrl,
     overlayColor = 'rgba(255, 255, 255, 0.95)',
+    titleColor = '#1e40af',
+    bodyColor = '#6b7280',
     customCss = '',
     customJs = '',
     logoUrl,
@@ -22,7 +24,13 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     directorName = 'Firma del Director',
     date = new Date().toISOString(),
     dateLocale = 'es-ES',
+    certificateSize = 'landscape',
+    orientation = 'landscape',
   } = config;
+
+  // Get dimensions based on certificate size
+  const dimensions = CERTIFICATE_DIMENSIONS[certificateSize];
+
 
   
 
@@ -76,11 +84,11 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-color: #1e40af;
+      --primary-color: ${titleColor};
       --secondary-color: #3b82f6;
       --accent-color: #fbbf24;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
+      --text-primary: ${titleColor};
+      --text-secondary: ${bodyColor};
       --text-muted: #9ca3af;
       --bg-primary: #ffffff;
       --bg-overlay: ${overlayColor};
@@ -101,24 +109,34 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       color: var(--text-primary);
       background: var(--bg-primary);
       line-height: 1.6;
+      margin: 0;
+      padding: 0;
     }
     
     .certificate-container {
       position: relative;
-      width: 100%;
-      height: 100vh;
+      width: ${dimensions.width}px;
+      height: ${dimensions.height}px;
+      max-width: 100vw;
+      max-height: 100vh;
       display: flex;
       align-items: stretch;
       justify-content: stretch;
-      padding: 0;
-      ${backgroundUrl ? `background: url('${backgroundUrl}') center/cover no-repeat;` : 'background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);'}
+      margin: 0 auto;
+      ${backgroundUrl && backgroundUrl.trim() ? `
+        background: url('${backgroundUrl}') center/cover no-repeat;
+      ` : `
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      `}
+      aspect-ratio: ${dimensions.aspectRatio};
     }
     
     .background-overlay {
       position: absolute;
       inset: 0;
-      background: var(--bg-overlay);
+      background: ${backgroundUrl && backgroundUrl.trim() ? 'rgba(0, 0, 0, 0.1)' : 'transparent'};
       z-index: 1;
+      pointer-events: none;
     }
     
     .certificate {
@@ -126,46 +144,21 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       z-index: 2;
       width: 100%;
       height: 100%;
-      background: var(--bg-primary);
+      background: var(--bg-overlay);
       border-radius: 0;
       box-shadow: none;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      ${backgroundUrl && backgroundUrl.trim() ? `
+        margin: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border-radius: 12px;
+        height: calc(100% - 40px);
+        width: calc(100% - 40px);
+      ` : ''}
     }
     
-    /* Decorative border */
-    .certificate::before {
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      bottom: 20px;
-      border: 2px solid var(--primary-color);
-      border-radius: 8px;
-      pointer-events: none;
-      z-index: 1;
-    }
-    
-    /* Corner decorations */
-    .certificate::after {
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      bottom: 20px;
-      background: 
-        radial-gradient(circle at 0 0, var(--secondary-color) 20%, transparent 20%),
-        radial-gradient(circle at 100% 0, var(--accent-color) 20%, transparent 20%),
-        radial-gradient(circle at 0 100%, var(--accent-color) 20%, transparent 20%),
-        radial-gradient(circle at 100% 100%, var(--secondary-color) 20%, transparent 20%);
-      background-size: 30px 30px;
-      background-position: 0 0, 100% 0, 0 100%, 100% 100%;
-      opacity: 0.08;
-      z-index: 1;
-    }
     
     .certificate-content {
       position: relative;
@@ -173,9 +166,10 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       height: 100%;
       display: grid;
       grid-template-rows: auto 1fr auto;
-      padding: 40px 60px;
+      padding: ${certificateSize === 'square' ? '25px 30px' : '30px 50px'};
       text-align: center;
       flex: 1;
+      min-height: 0;
     }
     
     /* Header Section */
@@ -183,8 +177,8 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 30px;
+      gap: 12px;
+      margin-bottom: 20px;
     }
     
     .logo-section {
@@ -200,8 +194,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       height: auto;
       width: auto;
       object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
     }
     
     .logo-placeholder {
@@ -210,13 +203,13 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+      background: var(--primary-color);
+      border-radius: 8px;
       color: white;
       font-weight: 600;
       font-size: 16px;
       letter-spacing: 0.5px;
+      opacity: 0.8;
     }
     
     .institution-name {
@@ -229,12 +222,11 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     
     .certificate-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(32px, 5vw, 48px);
+      font-size: ${certificateSize === 'square' ? 'clamp(28px, 4vw, 36px)' : 'clamp(32px, 5vw, 48px)'};
       font-weight: 700;
       color: var(--primary-color);
       letter-spacing: -0.5px;
       line-height: 1.1;
-      text-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
     }
     
     /* Body Section */
@@ -255,16 +247,17 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     
     .student-name {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 4vw, 36px);
+      font-size: ${certificateSize === 'square' ? 'clamp(22px, 3vw, 28px)' : 'clamp(28px, 4vw, 36px)'};
       font-weight: 600;
       color: var(--primary-color);
-      border-bottom: 3px solid var(--border-accent);
+      border-bottom: 2px solid var(--primary-color);
       padding-bottom: 12px;
       margin: 0 auto;
-      min-width: 350px;
-      max-width: 500px;
+      min-width: ${certificateSize === 'square' ? '250px' : '350px'};
+      max-width: ${certificateSize === 'square' ? '400px' : '500px'};
       letter-spacing: 0.5px;
       text-transform: capitalize;
+      opacity: 0.7;
     }
     
     .completion-text {
@@ -275,10 +268,9 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     }
     
     .course-info {
-      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      background: rgba(248, 250, 252, 0.5);
       padding: 20px 30px;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
+      border-radius: 8px;
       margin: 20px 0;
     }
     
@@ -304,9 +296,10 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       justify-content: space-between;
       align-items: end;
       gap: 40px;
-      margin-top: 30px;
-      padding-top: 25px;
-      border-top: 2px solid var(--border-color);
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      opacity: 0.8;
     }
     
     .signature-section {
@@ -316,9 +309,10 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     
     .signature-line {
       width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--text-secondary), transparent);
+      height: 1px;
+      background: var(--text-secondary);
       margin-bottom: 12px;
+      opacity: 0.3;
     }
     
     .signature-name {
@@ -357,33 +351,36 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
     @media (max-width: 768px) {
       .certificate-container {
         padding: 0;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
       }
       
       .certificate-content {
-        padding: 30px 25px;
+        padding: ${certificateSize === 'square' ? '20px 15px' : '20px 20px'};
         grid-template-rows: auto 1fr auto;
       }
       
       .certificate-header {
-        margin-bottom: 25px;
-        gap: 12px;
+        margin-bottom: ${certificateSize === 'square' ? '20px' : '25px'};
+        gap: ${certificateSize === 'square' ? '8px' : '12px'};
       }
       
       .certificate-title {
-        font-size: clamp(24px, 6vw, 32px);
+        font-size: ${certificateSize === 'square' ? 'clamp(20px, 5vw, 28px)' : 'clamp(24px, 6vw, 32px)'};
       }
       
       .student-name {
-        font-size: clamp(20px, 5vw, 28px);
-        min-width: 250px;
+        font-size: ${certificateSize === 'square' ? 'clamp(18px, 4vw, 24px)' : 'clamp(20px, 5vw, 28px)'};
+        min-width: ${certificateSize === 'square' ? '200px' : '250px'};
       }
       
       .certificate-footer {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
-        margin-top: 25px;
-        padding-top: 20px;
+        gap: ${certificateSize === 'square' ? '15px' : '20px'};
+        margin-top: ${certificateSize === 'square' ? '20px' : '25px'};
+        padding-top: ${certificateSize === 'square' ? '15px' : '20px'};
       }
       
       .date-section {
@@ -391,22 +388,8 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       }
       
       .course-info {
-        padding: 16px 20px;
-        margin: 15px 0;
-      }
-      
-      .certificate::before {
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
-      }
-      
-      .certificate::after {
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
+        padding: ${certificateSize === 'square' ? '12px 16px' : '16px 20px'};
+        margin: ${certificateSize === 'square' ? '12px 0' : '15px 0'};
       }
     }
     
@@ -429,22 +412,12 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
       
       .certificate {
         box-shadow: none !important;
-        border: 1px solid #ddd;
         page-break-inside: avoid;
         height: 100%;
       }
       
-      .certificate::before {
-        border-color: var(--primary-color);
-        opacity: 1;
-      }
-      
-      .certificate::after {
-        opacity: 0.15;
-      }
-      
       .certificate-content {
-        padding: 40px 60px;
+        padding: 30px 50px;
       }
     }
     
@@ -453,7 +426,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
 </head>
 <body>
   <div class="certificate-container" role="main" aria-label="Certificado">
-    ${backgroundUrl ? '<div class="background-overlay" aria-hidden="true"></div>' : ''}
+    <div class="background-overlay" aria-hidden="true"></div>
     
     <div class="certificate" role="document">
       <div class="certificate-content">
@@ -461,7 +434,7 @@ export const getTemplateHtml = (config: TemplateConfig): string => {
         <header class="certificate-header">
           <div class="logo-section">
             ${
-              logoUrl
+              logoUrl && logoUrl.trim()
                 ? `<img src="${logoUrl}" alt="Logo de la institución" class="logo" loading="lazy" />`
                 : `<div class="logo-placeholder" aria-label="Logo de la institución">
                      <span>LOGO</span>

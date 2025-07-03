@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Upload } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -21,9 +22,10 @@ interface ImageUploadProps {
   onUpload: (dataUrl: string) => void;
   label: string;
   className?: string;
+  tooltip?: string;
 }
 
-export default function ImageUpload({ onUpload, label, className = '' }: ImageUploadProps) {
+export default function ImageUpload({ onUpload, label, className = '', tooltip }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [showResizeModal, setShowResizeModal] = useState(false);
@@ -118,34 +120,55 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
   };
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      <Input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="hidden"
-      />
-      <div className="flex flex-col items-center gap-2">
-        {preview && (
-          <div className="relative w-32 h-32 border rounded-md overflow-hidden">
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => inputRef.current?.click()}
-          className="w-full bg-muted text-foreground hover:bg-accent"
-        >
-          <Upload className="mr-2 h-4 w-4" /> {label}
-        </Button>
-      </div>
-      <AlertDialog open={showResizeModal} onOpenChange={setShowResizeModal}>
+    <TooltipProvider>
+      <div className={cn("flex flex-col gap-4", className)}>
+        <Input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        <div className="flex flex-col items-center gap-2 bg-gradient-to-br from-white to-slate-50 dark:from-slate-50 dark:to-white p-3 rounded-xl border border-slate-200 dark:border-slate-300">
+          {preview && (
+            <div className="relative w-24 h-24 border rounded-md overflow-hidden mb-2">
+              <img
+                src={preview}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          {tooltip ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => inputRef.current?.click()}
+                  className="w-full bg-white dark:bg-slate-100 text-slate-700 dark:text-slate-800 border-slate-300 dark:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-200 transition-colors text-xs py-2 h-auto min-h-[2.5rem]"
+                >
+                  <Upload className="mr-2 h-4 w-4 flex-shrink-0" /> 
+                  <span className="truncate leading-tight">{label}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => inputRef.current?.click()}
+              className="w-full bg-white dark:bg-slate-100 text-slate-700 dark:text-slate-800 border-slate-300 dark:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-200 transition-colors text-xs py-2 h-auto min-h-[2.5rem]"
+            >
+              <Upload className="mr-2 h-4 w-4 flex-shrink-0" /> 
+              <span className="truncate leading-tight">{label}</span>
+            </Button>
+          )}
+        </div>
+        <AlertDialog open={showResizeModal} onOpenChange={setShowResizeModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Imagen Demasiado Grande</AlertDialogTitle>
@@ -165,6 +188,7 @@ export default function ImageUpload({ onUpload, label, className = '' }: ImageUp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

@@ -2,7 +2,7 @@
 
 import { AppLogo } from "@/components/logo";
 import { SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { Home, FileText, KeyRound, History, Settings, LogIn, LogOut, User } from "lucide-react";
+import { Home, FileText, KeyRound, History, Settings, LogIn, LogOut, User, Code2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -63,6 +63,7 @@ export function MainSidebar() {
     { href: "/templates", label: "Plantillas", icon: FileText },
     { href: "/keys", label: "Claves de API", icon: KeyRound },
     { href: "/audit-log", label: "Registro de Auditoría", icon: History },
+    { href: "/api-docs", label: "Documentación API", icon: Code2 },
   ];
   
   if (loading) {

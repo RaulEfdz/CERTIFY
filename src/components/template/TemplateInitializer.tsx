@@ -15,7 +15,7 @@ interface Template {
   tags: string[];
   config: any;
   html: string;
-  status: string;
+  status: 'draft' | 'published' | 'archived';
   is_public: boolean;
   created_by: string;
   organization_id: string | null;
@@ -74,9 +74,18 @@ export function TemplateInitializer({
         config: updatedConfig
       });
 
-      if (error) throw error;
+      if (error || !data) throw error;
 
-      const updatedTemplate = { ...template, ...data };
+      const updatedTemplate: Template = { 
+        ...template, 
+        name: data.name || template.name,
+        description: data.description || template.description,
+        category: data.category || template.category,
+        config: data.config || template.config,
+        status: (data.status || template.status) as 'draft' | 'published' | 'archived',
+        updated_at: data.updated_at || template.updated_at,
+        version: data.version || template.version
+      };
       setTemplate(updatedTemplate);
       
       if (onTemplateUpdate) {
@@ -113,9 +122,15 @@ export function TemplateInitializer({
       templateId={templateId}
       initialTemplate={template}
       onTemplateUpdate={(updatedTemplate) => {
-        setTemplate(updatedTemplate);
+        const fullTemplate: Template = {
+          ...template,
+          ...updatedTemplate,
+          category: template.category,
+          tags: template.tags
+        };
+        setTemplate(fullTemplate);
         if (onTemplateUpdate) {
-          onTemplateUpdate(updatedTemplate);
+          onTemplateUpdate(fullTemplate);
         }
       }}
     />

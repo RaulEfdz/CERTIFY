@@ -1,39 +1,60 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Settings2, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Settings2,
+  X,
+  Save,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Layers,
+  Palette,
+  Type,
+  Image,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useTemplateState } from "./editor/hooks/useTemplateState";
-import { TemplateHeader } from "./editor/components/TemplateHeader";
 import { TemplateSidebar } from "./editor/components/TemplateSidebar";
-import { TemplatePreview, PreviewControls } from "./editor/components/TemplatePreview";
-import { ConfigurationModal } from "./editor/components/ConfigurationModal";
 import { SaveTemplateModal, SaveTemplateData } from "./editor/components/SaveTemplateModal";
+import { ExportDropdown } from "./editor/components/ExportDropdown";
 import { getTemplateHtml } from "./editor/templates/defaultTemplate";
 import { TemplateConfig } from "./editor/types";
-import { createClient } from "@/lib/supabase/client";
 import { mockDatabase } from "@/lib/mock-db";
 
 interface Template {
   id: string;
   name: string;
   description: string;
-  category: string;
-  tags: string[];
   config: TemplateConfig;
   html: string;
-  status: string;
+  status: "draft" | "published" | "archived";
   is_public: boolean;
   created_by: string;
   organization_id: string | null;
-  auto_save_data: any;
+  auto_save_data: AutoSaveData | null;
   version: number;
   created_at: string;
   updated_at: string;
   last_saved_at: string;
+}
+
+interface AutoSaveData {
+  config: TemplateConfig;
+  html: string;
+  timestamp: string;
 }
 
 interface DynamicTemplateEditorProps {
@@ -42,30 +63,46 @@ interface DynamicTemplateEditorProps {
   onTemplateUpdate?: (template: Template) => void;
 }
 
-export function DynamicTemplateEditor({ 
-  templateId, 
-  initialTemplate, 
-  onTemplateUpdate 
+const TemplatePreview = ({ templateHtml, certificateSize, zoom = 1 }: any) => {
+  const dimensions = certificateSize === 'square' 
+    ? { width: 800, height: 800 }
+    : { width: 1000, height: 707 };
+    
+  return (
+    <div className="h-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-auto p-4">
+      <div
+        className="bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden transition-all duration-300 hover:shadow-3xl my-4"
+        style={{
+          transform: `scale(${zoom})`,
+          transformOrigin: "center center",
+          width: dimensions.width,
+          height: dimensions.height,
+          minWidth: certificateSize === 'square' ? '300px' : '400px',
+          minHeight: certificateSize === 'square' ? '300px' : '283px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        }}
+        dangerouslySetInnerHTML={{ __html: templateHtml }}
+      />
+    </div>
+  );
+};
+
+export function DynamicTemplateEditor({
+  templateId,
+  initialTemplate,
+  onTemplateUpdate,
 }: DynamicTemplateEditorProps) {
   const state = useTemplateState();
   const [template, setTemplate] = useState<Template>(initialTemplate);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [autoSaving, setAutoSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date>(new Date(initialTemplate.last_saved_at));
-  
-  // Auto-save timer
-  const autoSaveTimer = useRef<NodeJS.Timeout>();
-  const AUTO_SAVE_INTERVAL = 30000; // 30 segundos
+  const [zoom, setZoom] = useState(1);
+  // Removed activeTab state - only preview mode now
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // UI State
-  const [showSidebar, setShowSidebar] = useState(false);
-  const [activeTab, setActiveTab] = useState("preview");
-  const [previewControls, setPreviewControls] = useState<PreviewControls | null>(null);
+  const templateHtml = useMemo(() => getTemplateHtml(state), [state]);
 
-  // Inicializar el estado del editor con los datos de la plantilla
   useEffect(() => {
     if (initialTemplate.config) {
-      // Aplicar la configuración de la plantilla al estado
       const config = initialTemplate.config;
       state.setCertificateSize(config.certificateSize || 'landscape');
       state.setTitle(config.title || 'Certificado de Finalización');
@@ -97,310 +134,251 @@ export function DynamicTemplateEditor({
         state.setSignatures(config.signatures);
       }
     }
-
-    // Verificar si hay datos de auto-guardado más recientes
-    if (initialTemplate.auto_save_data) {
-      const autoSaveTime = new Date(initialTemplate.auto_save_data.timestamp);
-      const lastSaveTime = new Date(initialTemplate.last_saved_at);
-      
-      if (autoSaveTime > lastSaveTime) {
-        toast.info(
-          "Auto-saved changes detected. Would you like to restore them?",
-          {
-            action: {
-              label: "Restore",
-              onClick: () => restoreAutoSavedData(initialTemplate.auto_save_data)
-            },
-            duration: 10000
-          }
-        );
-      }
-    }
   }, [initialTemplate]);
 
-  // Generar HTML actualizado cuando cambia el estado
-  const templateHtml = getTemplateHtml(state as TemplateConfig);
-
-  // Detectar cambios y marcar como no guardado
-  useEffect(() => {
-    const currentConfig = state as TemplateConfig;
-    const hasChanged = JSON.stringify(currentConfig) !== JSON.stringify(template.config);
-    
-    if (hasChanged) {
-      setHasUnsavedChanges(true);
-      scheduleAutoSave();
-    }
-  }, [state, template.config]);
-
-  // Auto-save programado
-  const scheduleAutoSave = () => {
-    if (autoSaveTimer.current) {
-      clearTimeout(autoSaveTimer.current);
-    }
-
-    autoSaveTimer.current = setTimeout(() => {
-      performAutoSave();
-    }, AUTO_SAVE_INTERVAL);
-  };
-
-  // Realizar auto-guardado
-  const performAutoSave = async () => {
-    if (!hasUnsavedChanges || autoSaving) return;
-
-    try {
-      setAutoSaving(true);
-      const data = await mockDatabase.autoSave(templateId, state as any, templateHtml);
-
-      if (data.success) {
-        setLastSaved(new Date());
-        toast.success("Auto-saved", { duration: 2000 });
-      }
-    } catch (error) {
-      console.error('Auto-save failed:', error);
-      toast.error("Auto-save failed", { duration: 3000 });
-    } finally {
-      setAutoSaving(false);
-    }
-  };
-
-  // Restaurar datos auto-guardados
-  const restoreAutoSavedData = (autoSaveData: any) => {
-    if (autoSaveData.config) {
-      const config = autoSaveData.config;
-      // Aplicar configuración restaurada
-      Object.keys(config).forEach(key => {
-        const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}` as keyof typeof state;
-        const setter = state[setterName];
-        if (typeof setter === 'function') {
-          (setter as any)(config[key]);
-        }
-      });
-      
-      setHasUnsavedChanges(true);
-      toast.success("Auto-saved changes restored");
-    }
-  };
-
-  // Guardar cambios permanentes
   const handleSaveTemplate = async (templateData: SaveTemplateData): Promise<boolean> => {
     try {
       const data = await mockDatabase.saveTemplate(
         templateId,
-        state as any,
+        state,
         templateHtml,
         templateData.name,
         templateData.description
       );
 
       if (data.success) {
-        // Actualizar el estado local
         const updatedTemplate = {
           ...template,
           name: templateData.name,
           description: templateData.description,
-          config: state as TemplateConfig,
+          config: state,
           html: templateHtml,
           version: data.version || template.version,
-          last_saved_at: data.saved_at || template.last_saved_at
+          last_saved_at: data.saved_at || template.last_saved_at,
         };
-
         setTemplate(updatedTemplate);
-        setHasUnsavedChanges(false);
-        setLastSaved(new Date(data.saved_at || new Date().toISOString()));
         
         if (onTemplateUpdate) {
           onTemplateUpdate(updatedTemplate);
         }
-
-        // Limpiar timer de auto-save
-        if (autoSaveTimer.current) {
-          clearTimeout(autoSaveTimer.current);
-        }
-
-        toast.success("Template saved successfully!");
+        
+        toast.success("Plantilla guardada exitosamente!");
         return true;
+      } else {
+        toast.error("Error al guardar la plantilla");
+        return false;
       }
-
-      return false;
     } catch (error) {
       console.error('Error saving template:', error);
-      toast.error("Failed to save template");
+      toast.error("Error al guardar la plantilla");
       return false;
     }
   };
 
-  // Limpiar timer al desmontar
-  useEffect(() => {
-    return () => {
-      if (autoSaveTimer.current) {
-        clearTimeout(autoSaveTimer.current);
-      }
-    };
+  const handleZoomIn = useCallback(() => {
+    setZoom(prev => Math.min(prev + 0.25, 3));
   }, []);
 
-  // Manejar ESC para cerrar sidebar
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && showSidebar) {
-        setShowSidebar(false);
-      }
-      
-      // Ctrl+S para guardar
-      if (event.ctrlKey && event.key === 's') {
-        event.preventDefault();
-        if (hasUnsavedChanges) {
-          // Abrir modal de guardado
-          const saveButton = document.querySelector('[data-save-trigger]') as HTMLElement;
-          saveButton?.click();
-        }
-      }
-    };
+  const handleZoomOut = useCallback(() => {
+    setZoom(prev => Math.max(prev - 0.25, 0.25));
+  }, []);
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSidebar, hasUnsavedChanges]);
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev);
+  }, []);
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-background">
-        
-        {/* Overlay cuando el sidebar está abierto */}
-        {showSidebar && (
-          <div 
-            className="fixed inset-0 bg-black/20 z-40"
-            onClick={() => setShowSidebar(false)}
-          />
-        )}
-
-        {/* Sidebar como drawer */}
-        <aside className={`
-          fixed top-0 left-0 h-full w-80 max-w-[90vw] bg-background border-r shadow-xl z-50
-          transform transition-transform duration-300 ease-in-out
-          ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
-        `}>
+      <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
+        {/* Animated Sidebar */}
+        <aside
+          className={`relative transition-all duration-500 ease-in-out transform bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 backdrop-blur-xl ${
+            showSidebar ? "w-80 opacity-100 translate-x-0" : "w-0 opacity-0 -translate-x-full"
+          } shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50`}
+        >
           <div className="h-full flex flex-col">
-            {/* Header del drawer */}
-            <div className="p-3 border-b flex items-center justify-between bg-muted/50">
-              <div className="flex items-center gap-2">
-                <Settings2 className="h-4 w-4 text-primary" />
-                <h2 className="text-sm font-semibold">Configuración</h2>
-                {hasUnsavedChanges && (
-                  <span className="h-2 w-2 bg-orange-500 rounded-full" title="Unsaved changes" />
-                )}
+            {/* Elegant Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/60 dark:border-slate-700/60 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
+                  <Layers className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
+                    Editor de Plantilla
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Personaliza tu certificado</p>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground hidden sm:inline">
-                  ESC para cerrar
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setShowSidebar(false)}
-                  className="h-6 w-6 p-0 hover:bg-muted"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setShowSidebar(false)}
+                className="h-8 w-8 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
             </div>
             
-            {/* Contenido del sidebar */}
-            <div className="flex-1 overflow-y-auto">
-              <TemplateSidebar 
-                state={{
-                  certificateSize: state.certificateSize,
-                  logoUrl: state.logoUrl,
-                  logoWidth: state.logoWidth,
-                  logoHeight: state.logoHeight,
-                  title: state.title,
-                  body1: state.body1,
-                  body2: state.body2,
-                  courseName: state.courseName,
-                  studentName: state.studentName,
-                  orientation: state.orientation,
-                  backgroundUrl: state.backgroundUrl,
-                  overlayColor: state.overlayColor,
-                }}
-                setters={{
-                  setCertificateSize: state.setCertificateSize,
-                  setLogoUrl: (url: string | null) => state.setLogoUrl(url || ''),
-                  setLogoWidth: state.setLogoWidth,
-                  setLogoHeight: state.setLogoHeight,
-                  setTitle: state.setTitle,
-                  setBody1: state.setBody1,
-                  setBody2: state.setBody2,
-                  setCourseName: state.setCourseName,
-                  setStudentName: state.setStudentName,
-                  setOrientation: state.setOrientation,
-                  setBackgroundUrl: (url: string | null) => state.setBackgroundUrl(url || ''),
-                  setOverlayColor: state.setOverlayColor,
-                }}
-              />
-            </div>
-            
-            {/* Footer del drawer */}
-            <div className="p-3 border-t bg-muted/50">
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setShowSidebar(false)}
-                  className="flex-1"
-                >
-                  Cerrar
-                </Button>
-                <ConfigurationModal 
-                  state={state} 
-                  setters={state} 
-                  templateHtml={templateHtml}
-                >
-                  <Button variant="default" size="sm" className="flex-1">
-                    Avanzado
-                  </Button>
-                </ConfigurationModal>
+            {/* Sidebar Content with Scroll */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              <div className="p-6">
+                <TemplateSidebar 
+                  state={{
+                    certificateSize: state.certificateSize,
+                    logoUrl: state.logoUrl,
+                    logoWidth: state.logoWidth,
+                    logoHeight: state.logoHeight,
+                    title: state.title,
+                    body1: state.body1,
+                    body2: state.body2,
+                    courseName: state.courseName,
+                    studentName: state.studentName,
+                    orientation: state.orientation,
+                    backgroundUrl: state.backgroundUrl,
+                    overlayColor: state.overlayColor,
+                    titleColor: state.titleColor,
+                    bodyColor: state.bodyColor,
+                  }}
+                  setters={{
+                    setCertificateSize: state.setCertificateSize,
+                    setLogoUrl: state.setLogoUrl,
+                    setLogoWidth: state.setLogoWidth,
+                    setLogoHeight: state.setLogoHeight,
+                    setTitle: state.setTitle,
+                    setBody1: state.setBody1,
+                    setBody2: state.setBody2,
+                    setCourseName: state.setCourseName,
+                    setStudentName: state.setStudentName,
+                    setOrientation: state.setOrientation,
+                    setBackgroundUrl: state.setBackgroundUrl,
+                    setOverlayColor: state.setOverlayColor,
+                    setTitleColor: state.setTitleColor,
+                    setBodyColor: state.setBodyColor,
+                  }}
+                />
               </div>
             </div>
           </div>
         </aside>
 
-        {/* Panel central */}
-        <main className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-shrink-0">
-            <TemplateHeader 
-              templateConfig={state}
+        {/* Main Content Area */}
+        <main className="flex flex-col flex-1 min-w-0">
+          {/* Modern Header with Actions */}
+          <header className="h-16 flex items-center justify-between px-6 border-b border-slate-200/60 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-sm">
+            <div className="flex items-center gap-4">
+              {!showSidebar && (
+                <Button
+                  onClick={() => setShowSidebar(true)}
+                  size="icon"
+                  variant="ghost"
+                  className="h-9 w-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
+                  {template.status === "draft" ? "Borrador" : template.status === "published" ? "Publicado" : "Archivado"}
+                </Badge>
+                <h1 className="text-sm font-semibold text-slate-900 dark:text-white truncate max-w-xs">
+                  {template.name}
+                </h1>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              {/* Removed Tab Switcher - only preview mode now */}
+
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleZoomOut}
+                      disabled={zoom <= 0.25}
+                      className="h-8 w-8 p-0 rounded-lg"
+                    >
+                      <ZoomOut className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Alejar</TooltipContent>
+                </Tooltip>
+                
+                <span className="text-xs font-medium text-slate-600 dark:text-slate-400 min-w-[3rem] text-center">
+                  {Math.round(zoom * 100)}%
+                </span>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleZoomIn}
+                      disabled={zoom >= 3}
+                      className="h-8 w-8 p-0 rounded-lg"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Acercar</TooltipContent>
+                </Tooltip>
+              </div>
+
+              {/* Action Buttons */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={toggleFullscreen}
+                    className="h-9 w-9 p-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Pantalla Completa</TooltipContent>
+              </Tooltip>
+
+              <SaveTemplateModal
+                templateConfig={state}
+                templateHtml={templateHtml}
+                onSave={handleSaveTemplate}
+                initialName={template.name}
+                initialDescription={template.description}
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      className="h-9 px-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg transition-all duration-200"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Guardar
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Guardar Plantilla</TooltipContent>
+                </Tooltip>
+              </SaveTemplateModal>
+            </div>
+          </header>
+
+          {/* Content Area - Preview Only */}
+          <div className="flex-1 overflow-hidden relative">
+            <TemplatePreview
               templateHtml={templateHtml}
-              onSave={handleSaveTemplate}
-              showSidebar={showSidebar}
-              onToggleSidebar={() => setShowSidebar(!showSidebar)}
-              previewControls={previewControls}
-              activeTab={activeTab}
-              onTabChange={(tab: string) => setActiveTab(tab)}
-              templateName={template.name}
-              hasUnsavedChanges={hasUnsavedChanges}
-              lastSaved={lastSaved}
-              autoSaving={autoSaving}
+              certificateSize={state.certificateSize}
+              zoom={zoom}
             />
           </div>
-
-          <div className="flex-1 overflow-hidden">
-            {activeTab === "preview" && (
-              <TemplatePreview
-                templateHtml={templateHtml}
-                certificateSize={state.certificateSize}
-                hideControls={true}
-              />
-            )}
-            {activeTab === "code" && (
-              <div className="h-full overflow-auto bg-background p-4">
-                <pre className="bg-muted p-4 rounded-md overflow-auto h-full">
-                  <code className="text-sm">
-                    {templateHtml}
-                  </code>
-                </pre>
-              </div>
-            )}
-          </div>
         </main>
+
       </div>
     </TooltipProvider>
   );
 }
+
+export { TemplatePreview };
